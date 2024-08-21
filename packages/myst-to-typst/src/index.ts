@@ -65,6 +65,14 @@ const blockquote = `#let blockquote(node, color: gray) = {
 
 const INDENT = '  ';
 
+function identifierToTerm(identifier: string): string {
+  // Try and strip off the term- prefix, as we're using #gls() for now
+  // which makes it obvious that we have a term
+  const match = identifier.match(/term-(.*)/);
+  // Fall back to full identifier (in case this changes in future)
+  return match?.[1] ?? identifier;
+}
+
 const linkHandler = (node: any, state: ITypstSerializer) => {
   const href = node.url;
   state.write('#link("');
@@ -252,6 +260,42 @@ const handlers: Record<string, Handler> = {
     });
     state.renderChildren(node);
   },
+  glossary(node, state) {
+    state.useMacro(`
+#import "@preview/glossarium:0.4.1": make-glossary, print-glossary, gls, glspl 
+#show: make-glossary
+`);
+    state.write(`#print-glossary(
+    disable-back-references: true,
+    (
+`);
+
+    const definitionList = node.children[0];
+    for (let i = 0; i < definitionList.children.length - 1; i += 2) {
+      const termNode = definitionList.children[i];
+      const definitionNode = definitionList.children[i + 1];
+
+      state.write(`        (`);
+
+      const term = identifierToTerm(termNode.identifier);
+      state.write(`key: "${term}"`);
+
+      state.write(`, short: [`);
+      state.renderChildren(termNode);
+      state.write(`]`);
+
+      state.write(`, desc: [`);
+      state.renderChildren(definitionNode);
+      state.write(`]`);
+
+      state.write(`),\n`);
+    }
+    state.write(
+      `    )
+)
+`,
+    );
+  },
   link: linkHandler,
   admonition(node: Admonition, state) {
     state.useMacro(admonition);
@@ -298,6 +342,11 @@ const handlers: Record<string, Handler> = {
   legend: captionHandler,
   captionNumber: () => undefined,
   crossReference(node, state, parent) {
+    if (node.kind === 'definitionTerm') {
+      const term = identifierToTerm(node.identifier);
+      state.write(`#gls("${term}")`);
+      return;
+    }
     // Look up reference and add the text
     // const usedTemplate = node.template?.includes('%s') ? node.template : undefined;
     // const text = (usedTemplate ?? toText(node))?.replace(/\s/g, '~') || '%s';

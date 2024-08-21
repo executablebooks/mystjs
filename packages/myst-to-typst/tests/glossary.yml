@@ -1,0 +1,50 @@
+title: myst-to-typst glossary
+cases:
+  - title: reference single term
+    mdast:
+      type: root
+      children:
+        - type: glossary
+          children:
+            - type: definitionList
+              children:
+                - type: definitionTerm
+                  children:
+                    - type: text
+                      value: foo
+                  label: foo
+                  identifier: term-foo
+                - type: definitionDescription
+                  children:
+                    - type: text
+                      value: A foo
+                - type: definitionTerm
+                  children:
+                    - type: text
+                      value: bar
+                  label: bar
+                  identifier: term-bar
+                - type: definitionDescription
+                  children:
+                    - type: text
+                      value: A bar
+        - type: paragraph
+          children:
+            - type: crossReference
+              label: foo
+              identifier: term-foo
+              kind: definitionTerm
+              children:
+                - type: text
+                  value: foo
+              template: '{name}'
+              resolved: true
+    typst: |-
+      #print-glossary(
+          disable-back-references: true,
+          (
+              (key: "foo", short: [foo], desc: [A foo]),
+              (key: "bar", short: [bar], desc: [A bar]),
+          )
+      )
+      #gls("foo")
