@@ -1,6 +1,7 @@
 import { selectAll } from 'unist-util-select';
 import { EXIT, SKIP, visit } from 'unist-util-visit';
 import type { GenericNode, GenericParent } from './types.js';
+import escape from 'css.escape';
 
 /**
  * Determine if node with `identifier` should be considered a target
@@ -85,9 +86,11 @@ export function selectMdastNodes(
 ): { htmlId?: string; nodes: GenericNode[] } {
   if (maxNodes === 0) return { nodes: [] };
   // Select the first identifier that is not a crossReference or citation
-  const node = selectAll(`[identifier=${identifier}],[key=${identifier}]`, mdast).find((n) =>
-    isTargetIdentifierNode(n),
-  ) as GenericNode | undefined;
+  const escapedIdentifier = escape(identifier);
+  const node = selectAll(
+    `[identifier=${escapedIdentifier}],[key=${escapedIdentifier}]`,
+    mdast,
+  ).find((n) => isTargetIdentifierNode(n)) as GenericNode | undefined;
   if (!node) return { nodes: [] };
   switch (node.type) {
     case 'heading':

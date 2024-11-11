@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import type { Content } from 'mdast';
+import type { RootContent } from 'mdast';
 import { createDocFromState, DocxSerializer, writeDocx } from 'myst-to-docx';
 import { tic, writeFileToFolder } from 'myst-cli-utils';
 import {
@@ -12,7 +12,7 @@ import {
 import type { RendererDoc } from 'myst-templates';
 import MystTemplate from 'myst-templates';
 import { htmlTransform } from 'myst-transforms';
-import { fileError, fileWarn, RuleId, TemplateKind } from 'myst-common';
+import { fileError, fileWarn, RuleId, TemplateKind, type GenericNode } from 'myst-common';
 import { selectAll } from 'unist-util-select';
 import { filterKeys } from 'simple-validators';
 import { VFile } from 'vfile';
@@ -40,7 +40,10 @@ function defaultWordRenderer(
   vfile: VFile,
 ) {
   const { mdast, frontmatter, references } = data;
-  const frontmatterNodes = createArticleTitle(frontmatter.title, frontmatter.authors) as Content[];
+  const frontmatterNodes = createArticleTitle(
+    frontmatter.title,
+    frontmatter.authors,
+  ) as RootContent[];
   const serializer = new DocxSerializer(
     vfile,
     {
@@ -54,7 +57,7 @@ function defaultWordRenderer(
     frontmatter,
   );
   frontmatterNodes.forEach((node) => {
-    serializer.render(node);
+    serializer.render(node as GenericNode);
   });
   serializer.renderChildren(mdast);
   const referencesDocStates = Object.values(references.cite?.data ?? {})
@@ -69,7 +72,7 @@ function defaultWordRenderer(
     serializer.renderChildren(referencesRoot);
   }
   selectAll('footnoteDefinition', mdast).forEach((footnote) => {
-    serializer.render(footnote);
+    serializer.render(footnote as GenericNode);
   });
   const logo = path.join(staticPath, 'logo.png');
   const docfooter = fs.existsSync(logo) && !opts.hideFooter ? createFooter(logo) : undefined;

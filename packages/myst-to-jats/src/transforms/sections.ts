@@ -88,11 +88,8 @@ export function sectionTransform(tree: GenericParent, opts?: Pick<Options, 'isSu
       (node as any).type = '__delete__';
     }
   });
-  const removed = remove(tree, '__delete__');
-  if (removed === null) {
-    // remove is unhappy if all children are removed - this forces it through
-    tree.children = [];
-  }
+  remove(tree, '__delete__');
+
   liftChildren(tree, 'block'); // this looses part information. TODO: milestones
   headingsToSections(tree);
 }

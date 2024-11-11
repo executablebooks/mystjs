@@ -20,7 +20,7 @@ function liftCaptionNumber(container: Container) {
   const caption = select('caption', container);
   const captionNumber = select('captionNumber', container);
   if (caption) remove(caption, 'captionNumber');
-  if (captionNumber) container.children.splice(0, 0, captionNumber);
+  if (captionNumber) container.children.splice(0, 0, captionNumber as any);
 }
 
 export function containerTransform(mdast: GenericParent) {
@@ -35,7 +35,7 @@ export function containerTransform(mdast: GenericParent) {
         newContainer.type = 'blockquote';
         newContainer.children = blockquote.children;
         caption.type = 'attrib'; // Change the caption to attribution for JATS
-        newContainer.children.push(caption);
+        newContainer.children.push(caption as any);
       }
     }
     const caption = (select('caption', container) ?? { type: 'caption', children: [] }) as Caption;

@@ -81,7 +81,7 @@ import { rawDirectiveTransform } from '../transforms/raw.js';
 
 const LINKS_SELECTOR = 'link,card,linkBlock';
 
-const pluginUtils: PluginUtils = { select, selectAll };
+const pluginUtils: PluginUtils = { select, selectAll } as any;
 
 const htmlHandlers = {
   comment(h: any, node: any) {

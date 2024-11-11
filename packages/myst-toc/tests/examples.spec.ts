@@ -22,9 +22,7 @@ describe.each([
   ['url', 'https://google.com'],
   ['pattern', 'main*.md'],
 ])('Single %s entry', (entryName, entryValue) => {
-  test.each([
-    ['title', 'document'],
-  ])('with %s passes', (name, value) => {
+  test.each([['title', 'document']])('with %s passes', (name, value) => {
     const entry = {};
     entry[entryName] = entryValue;
     entry[name] = value;
@@ -35,9 +33,7 @@ describe.each([
     expect(toc).toStrictEqual(input);
   });
 
-  test.each([
-    ['title', 1000, 'string'],
-  ])('with invalid type for %s fails', (name, value, type) => {
+  test.each([['title', 1000, 'string']])('with invalid type for %s fails', (name, value, type) => {
     const input = [{ file: 'foo.md' }];
     input[0][name] = value;
     validateTOC(input, opts);

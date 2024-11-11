@@ -107,9 +107,9 @@ cases:
                     - type: text
                       value: Some more markdown
     markdown: |-
-      *   Some markdown
+      * Some markdown
 
-      *   Some more markdown
+      * Some more markdown
   - title: ordered list
     mdast:
       type: root
@@ -131,9 +131,9 @@ cases:
                     - type: text
                       value: Some more markdown
     markdown: |-
-      5.  Some markdown
+      5. Some markdown
 
-      6.  Some more markdown
+      6. Some more markdown
   - title: html
     mdast:
       type: root

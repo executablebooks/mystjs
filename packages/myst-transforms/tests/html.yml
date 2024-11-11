@@ -43,8 +43,8 @@ cases:
       type: root
       children:
         - type: image
-          url: example.jpg
           title: example
+          url: example.jpg
   - title: table
     before:
       type: root

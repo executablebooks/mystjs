@@ -4,7 +4,7 @@ import type { Heading } from 'myst-spec';
 import { visit } from 'unist-util-visit';
 import { select, selectAll } from 'unist-util-select';
 import { findAndReplace } from 'mdast-util-find-and-replace';
-import type { Content } from 'mdast';
+import type { Node } from 'mdast';
 
 export enum TargetKind {
   heading = 'heading',
@@ -40,7 +40,10 @@ export type EnumeratorOptions = {
  */
 function fillReferenceEnumerators(node: GenericNode, enumerator: string | number) {
   const num = String(enumerator);
-  findAndReplace(node as Content, { '%s': num, '{number}': num });
+  findAndReplace(node as any, [
+    ['%s', num],
+    ['{number}', num],
+  ]);
 }
 
 function kindFromNode(node: GenericNode): string | undefined {

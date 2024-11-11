@@ -3,7 +3,7 @@ import { basename, extname, join } from 'node:path';
 import chalk from 'chalk';
 import { Inventory, Domains } from 'intersphinx';
 import { writeFileToFolder, tic, hashAndCopyStaticFile } from 'myst-cli-utils';
-import { RuleId, toText, plural, slugToUrl } from 'myst-common';
+import { RuleId, toText, plural, slugToUrl, type GenericNode } from 'myst-common';
 import type { SiteConfig, SiteProject } from 'myst-config';
 import type { Node } from 'myst-spec';
 import type { SearchRecord, MystSearchIndex } from 'myst-spec-ext';
@@ -110,7 +110,7 @@ function getReferenceTitleAsText(targetNode: Node): string | undefined {
     return toText(targetNode);
   }
   const caption = select('caption > paragraph', targetNode);
-  if (caption) return toText(caption);
+  if (caption) return toText(caption as GenericNode);
 }
 
 /**

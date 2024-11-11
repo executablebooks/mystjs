@@ -198,8 +198,8 @@ const handlers: Record<string, Handler> = {
     state.openNode('tabSet');
     node.children?.forEach((n) => {
       state.openNode('tabItem', {
-        title: toText(select('label', n)),
-        sync: toText(select('label', n)),
+        title: toText(select('label', n) as GenericNode),
+        sync: toText(select('label', n) as GenericNode),
       });
       state.renderChildren({ children: [n] });
       state.closeNode();
@@ -451,18 +451,23 @@ export class JatsParser implements IJatsParser {
     return this.pushNode(node);
   }
 }
+declare module 'unified' {
+  interface CompileResultMap {
+    VFile: VFile;
+  }
+}
 
 export const jatsToMystPlugin: Plugin<[Jats, Options?], Root, Root> = function (jats, opts) {
-  this.Compiler = (node: GenericParent, file: VFile) => {
+  this.compiler = (node, file: VFile) => {
     const tree = jats.abstract
       ? {
           type: 'root',
           children: [
             u('block', { part: 'abstract' }, copyNode(jats.abstract).children),
-            ...copyNode(node).children,
+            ...copyNode(node as any).children,
           ],
         }
-      : copyNode(node);
+      : copyNode(node as any);
     // Can do better than this in the future, but for now, just put them at the end!
     const floatsGroup = selectAll('floats-group', jats.tree) as GenericParent[];
     if (floatsGroup.length > 0) {
@@ -479,18 +484,21 @@ export const jatsToMystPlugin: Plugin<[Jats, Options?], Root, Root> = function (
       jats.references.map((bibr) => {
         const id = bibr.id;
         const names = selectAll('name,string-name', bibr)
-          .map((n) => `${toText(select('surname', n))}, ${toText(select('given-names', n))}`)
+          .map(
+            (n) =>
+              `${toText(select('surname', n) as GenericNode)}, ${toText(select('given-names', n) as GenericNode)}`,
+          )
           .join(', ');
-        const year = toText(select('year', bibr));
-        const title = toText(select('article-title', bibr));
-        const source = toText(select('source', bibr));
-        const volume = toText(select('volume', bibr));
-        const fpage = toText(select('fpage', bibr));
-        const lpage = toText(select('lpage', bibr));
+        const year = toText(select('year', bibr) as GenericNode);
+        const title = toText(select('article-title', bibr) as GenericNode);
+        const source = toText(select('source', bibr) as GenericNode);
+        const volume = toText(select('volume', bibr) as GenericNode);
+        const fpage = toText(select('fpage', bibr) as GenericNode);
+        const lpage = toText(select('lpage', bibr) as GenericNode);
         const doiElement = selectAll('ext-link,[pub-id-type=doi]', bibr).find((e) =>
-          doi.validate(toText(e)),
+          doi.validate(toText(e as GenericNode)),
         );
-        const doiString = doiElement ? toText(doiElement) : undefined;
+        const doiString = doiElement ? toText(doiElement as GenericNode) : undefined;
         const doiLink = doiString ? ` <a href=${doi.buildUrl(doiString)}>${doiString}</a>` : '';
         return [
           id,
@@ -519,10 +527,6 @@ export const jatsToMystPlugin: Plugin<[Jats, Options?], Root, Root> = function (
     };
     file.result = result;
     return file;
-  };
-
-  return (node: Root) => {
-    return node;
   };
 };
 

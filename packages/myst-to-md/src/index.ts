@@ -15,6 +15,12 @@ import type { PageFrontmatter } from 'myst-frontmatter';
 const FOOTNOTE_HANDLER_KEYS = ['footnoteDefinition', 'footnoteReference'];
 const TABLE_HANDLER_KEYS = ['table', 'tableRow', 'tableCell'];
 
+declare module 'unified' {
+  interface CompileResultMap {
+    VFile: VFile;
+  }
+}
+
 export function writeMd(file: VFile, node: Root, frontmatter?: PageFrontmatter) {
   const handlers = {
     ...directiveHandlers,
@@ -46,13 +52,8 @@ export function writeMd(file: VFile, node: Root, frontmatter?: PageFrontmatter) 
 }
 
 const plugin: Plugin<[PageFrontmatter?], Root, VFile> = function (frontmatter?) {
-  this.Compiler = (node, file) => {
-    return writeMd(file, node, frontmatter);
-  };
-
-  return (node: Root) => {
-    // Preprocess
-    return node;
+  this.compiler = (node, file) => {
+    return writeMd(file, node as any, frontmatter);
   };
 };
 

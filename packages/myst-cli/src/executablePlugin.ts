@@ -5,6 +5,7 @@ import {
   type RoleSpec,
   type TransformSpec,
   type GenericNode,
+  type GenericParent,
 } from 'myst-common';
 import { spawn, spawnSync } from 'node:child_process';
 
@@ -117,7 +118,7 @@ function wrapTransform(
   return {
     ...transform,
     plugin: () => {
-      return async (node) => {
+      return async (node: GenericParent) => {
         // Modify the tree in-place
         const result = await executeAsyncParser(session, transform.name, node, path, 'transform');
         Object.assign(node, result);

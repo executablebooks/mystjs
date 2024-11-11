@@ -76,7 +76,7 @@ export function processPageFrontmatter(
   const cache = castSession(session);
   const state = session.store.getState();
   const siteFrontmatter = selectors.selectCurrentSiteConfig(state) ?? {};
-  const projectFrontmatter = path ? selectors.selectLocalProjectConfig(state, path) ?? {} : {};
+  const projectFrontmatter = path ? (selectors.selectLocalProjectConfig(state, path) ?? {}) : {};
 
   const frontmatter = fillPageFrontmatter(pageFrontmatter, projectFrontmatter, validationOpts);
   const siteTemplate = cache.$siteTemplate;

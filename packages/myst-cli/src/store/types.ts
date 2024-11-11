@@ -1,4 +1,4 @@
-import type { VFileMessage } from 'vfile-message';
+import type { Position } from 'unist';
 
 export type ExternalLinkResult = {
   url: string;
@@ -15,7 +15,7 @@ export type BuildWarning = {
   kind: WarningKind;
   note?: string | null;
   url?: string | null;
-  position?: VFileMessage['position'];
+  position?: Position;
   ruleId?: string | null;
 };
 

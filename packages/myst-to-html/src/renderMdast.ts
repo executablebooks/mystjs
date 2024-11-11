@@ -29,6 +29,6 @@ export function mystToHtml(
     .use(formatHtml, opts?.formatHtml)
     .use(rehypeStringify, opts?.stringifyHtml);
   const result = pipe.runSync(tree);
-  const html = pipe.stringify(result);
+  const html = pipe.stringify(result as any);
   return html.trim();
 }

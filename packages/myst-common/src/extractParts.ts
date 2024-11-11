@@ -33,7 +33,7 @@ function coercePart(part?: string | string[]): string[] {
 export function selectBlockParts(tree: GenericParent, part?: string | string[]): Block[] {
   const parts = coercePart(part);
   if (parts.length === 0) return [];
-  const blockParts = selectAll('block', tree).filter((block) => {
+  const blockParts = (selectAll('block', tree) as Block[]).filter((block) => {
     const blockTags: string[] = (
       block.data?.tags && Array.isArray(block.data.tags) ? block.data.tags : []
     ).map((tag) => tag?.toLowerCase());
@@ -82,14 +82,6 @@ function createPartBlock(
     block.data.part = part;
   }
   return block;
-}
-
-function forcedRemove(tree: GenericParent, test: string) {
-  let success = remove(tree, test);
-  if (!success) {
-    success = remove(tree, { cascade: false }, test);
-  }
-  return success;
 }
 
 /**
@@ -150,7 +142,7 @@ export function extractImplicitPart(
   });
   if (blockParts.length === 0) return;
   const partsTree = { type: 'root', children: blockParts } as GenericParent;
-  forcedRemove(tree, '__part_delete__');
+  remove(tree, '__part_delete__');
   return partsTree;
 }
 
@@ -209,6 +201,6 @@ export function extractPart(
   blockParts.forEach((block) => {
     (block as any).type = '__delete__';
   });
-  forcedRemove(tree, '__delete__');
+  remove(tree, '__delete__');
   return partsTree;
 }

@@ -11,7 +11,12 @@ export function logMessagesFromVFile(session: ISession, file?: VFile): void {
     const kind: WarningKind =
       message.fatal === null ? 'info' : message.fatal === false ? 'warn' : 'error';
     addWarningForFile(session, file.path, message.message, kind, {
-      position: message.position,
+      // TODO: does this logic make sense, or should we support `place`?
+      position: message.place
+        ? 'start' in message.place
+          ? message.place
+          : { start: message.place, end: message.place }
+        : undefined,
       note: message.note,
       url: message.url,
       ruleId: message.ruleId,

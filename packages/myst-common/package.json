@@ -19,21 +19,23 @@
     "build": "npm-run-all -l clean -p build:esm"
   },
   "dependencies": {
+    "css.escape": "^1.5.1",
     "mdast": "^3.0.0",
     "myst-frontmatter": "^1.7.4",
     "myst-spec": "^0.0.5",
     "nanoid": "^4.0.0",
-    "unified": "^10.1.2",
-    "unist-util-remove": "^3.1.0",
-    "unist-util-select": "^4.0.3",
+    "unified": "^11.0.0",
+    "unist-util-remove": "^4.0.0",
+    "unist-util-select": "^5.0.0",
     "unist-util-visit": "^4.1.2",
-    "vfile": "^5.0.0",
-    "vfile-message": "^3.0.0"
+    "vfile": "^6.0.0",
+    "vfile-message": "^4.0.0"
   },
   "devDependencies": {
-    "myst-spec-ext": "^1.7.4",
-    "unist-builder": "3.0.0",
     "@jupyterlab/nbformat": "^3.5.2",
-    "@lumino/coreutils": "^2.0.0"
+    "@lumino/coreutils": "^2.0.0",
+    "@types/css.escape": "^1.5.2",
+    "myst-spec-ext": "^1.7.4",
+    "unist-builder": "4.0.0"
   }
 }

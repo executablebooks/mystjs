@@ -1,4 +1,4 @@
-import YAML from 'js-yaml';
+import { dump as dumpYAML } from 'js-yaml';
 import type { Handle } from 'mdast-util-to-markdown';
 import { RuleId, fileError } from 'myst-common';
 import type { PageFrontmatter } from 'myst-frontmatter';
@@ -83,5 +83,5 @@ export function addFrontmatter(page: string, frontmatter?: PageFrontmatter) {
   const fm = frontmatter.license
     ? { ...frontmatter, license: simplifyLicenses(frontmatter.license) }
     : { ...frontmatter };
-  return `---\n${YAML.dump(fm)}---\n${page}`;
+  return `---\n${dumpYAML(fm)}---\n${page}`;
 }

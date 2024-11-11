@@ -34,11 +34,7 @@ export function blockTransform(tree: GenericParent, opts: Options) {
   doNotDelete.forEach((node) => {
     node.type = 'block-part' as any;
   });
-  const removed = remove(tree, '__delete__');
-  if (removed === null) {
-    // remove is unhappy if all children are removed - this forces it through
-    tree.children = [];
-  }
+  remove(tree, '__delete__');
 }
 
 export const blockPlugin: Plugin<[Options], GenericParent, GenericParent> = (opts) => (tree) => {

@@ -24,14 +24,17 @@ function addMessageInfo(message: VFileMessage, info?: MessageInfo) {
 }
 
 export function fileError(file: VFile, message: string | Error, opts?: MessageInfo): VFileMessage {
+  //@ts-expect-error file.message signature
   return addMessageInfo(file.message(message, opts?.node, opts?.source), { ...opts, fatal: true });
 }
 
 export function fileWarn(file: VFile, message: string | Error, opts?: MessageInfo): VFileMessage {
+  //@ts-expect-error file.message signature
   return addMessageInfo(file.message(message, opts?.node, opts?.source), opts);
 }
 
 export function fileInfo(file: VFile, message: string | Error, opts?: MessageInfo): VFileMessage {
+  //@ts-expect-error file.message signature
   return addMessageInfo(file.info(message, opts?.node, opts?.source), opts);
 }
 

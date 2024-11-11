@@ -47,17 +47,17 @@
     "myst-spec-ext": "^1.7.2",
     "myst-transforms": "^1.3.26",
     "nbtx": "^0.2.3",
-    "unified": "^10.1.2",
-    "unist-util-remove": "^3.1.0",
-    "unist-util-select": "^4.0.3",
-    "vfile": "^5.0.0",
-    "vfile-reporter": "^7.0.4",
+    "unified": "^11.0.0",
+    "unist-util-remove": "^4.0.0",
+    "unist-util-select": "^5.0.0",
+    "vfile": "^6.0.0",
+    "vfile-reporter": "^8.0.0",
     "xml-js": "^1.6.11"
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.5",
     "@types/katex": "^0.14.0",
-    "@types/mdast": "^3.0.10",
+    "@types/mdast": "^4.0.0",
     "jats-xml": "^1.0.7",
     "js-yaml": "^4.1.0",
     "myst-cli-utils": "^2.0.11"

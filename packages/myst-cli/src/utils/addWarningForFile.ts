@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import type { VFileMessage } from 'vfile-message';
+import type { Position } from 'unist';
 import type { ISession } from '../session/types.js';
 import { warnings } from '../store/reducers.js';
 import type { WarningKind } from '../store/types.js';
@@ -13,7 +13,7 @@ export function addWarningForFile(
   opts?: {
     note?: string | null;
     url?: string | null;
-    position?: VFileMessage['position'];
+    position?: Position;
     ruleId?: string | null;
     /** This key can be combined with the ruleId to suppress a warning */
     key?: string | null;

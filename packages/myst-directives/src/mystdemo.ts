@@ -1,4 +1,4 @@
-import yaml from 'js-yaml';
+import { load as loadYAML } from 'js-yaml';
 import type { DirectiveSpec, DirectiveData, GenericNode } from 'myst-common';
 
 export const mystdemoDirective: DirectiveSpec = {
@@ -16,7 +16,7 @@ export const mystdemoDirective: DirectiveSpec = {
     let numbering: any;
     if (data.options?.numbering) {
       try {
-        numbering = yaml.load(data.options.numbering as string);
+        numbering = loadYAML(data.options.numbering as string);
       } catch (err) {
         //pass
       }

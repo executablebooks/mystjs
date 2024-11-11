@@ -1079,18 +1079,19 @@ export function writeJats(file: VFile, content: ArticleContent, opts?: DocumentO
   return file;
 }
 
+declare module 'unified' {
+  interface CompileResultMap {
+    VFile: VFile;
+  }
+}
+
 const plugin: Plugin<
   [SourceFileKind, FrontmatterWithParts?, CitationRenderer?, string?, DocumentOptions?],
   Root,
   VFile
 > = function (kind, frontmatter, citations, slug, opts) {
-  this.Compiler = (node, file) => {
+  this.compiler = (node, file) => {
     return writeJats(file, { mdast: node as any, kind, frontmatter, citations, slug }, opts);
-  };
-
-  return (node: Root) => {
-    // Preprocess
-    return node;
   };
 };
 

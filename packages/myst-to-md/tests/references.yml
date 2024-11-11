@@ -101,9 +101,9 @@ cases:
                       value: Some more markdown
     markdown: |-
       (my-list)=
-      *   Some markdown
+      * Some markdown
 
-      *   Some more markdown
+      * Some more markdown
   - title: crossReference
     mdast:
       type: root

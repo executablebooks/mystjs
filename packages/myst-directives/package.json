@@ -38,7 +38,7 @@
     "myst-common": "^1.7.4",
     "myst-spec-ext": "^1.7.4",
     "nanoid": "^4.0.2",
-    "unist-util-select": "^4.0.3",
-    "vfile": "^5.3.7"
+    "unist-util-select": "^5.0.0",
+    "vfile": "^6.0.0"
   }
 }

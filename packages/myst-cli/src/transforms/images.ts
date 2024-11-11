@@ -6,7 +6,7 @@ import { computeHash, hashAndCopyStaticFile, isUrl } from 'myst-cli-utils';
 import { remove } from 'unist-util-remove';
 import { selectAll } from 'unist-util-select';
 import path from 'node:path';
-import type { VFileMessage } from 'vfile-message';
+import type { Position } from 'unist';
 import type { PageFrontmatter } from 'myst-frontmatter';
 import type { Image } from 'myst-spec-ext';
 import { extFromMimeType } from 'nbtx';
@@ -127,7 +127,7 @@ export async function saveImageInStaticFolder(
   urlSource: string,
   sourceFile: string,
   writeFolder: string,
-  opts?: { altOutputFolder?: string; position?: VFileMessage['position'] },
+  opts?: { altOutputFolder?: string; position?: Position },
 ): Promise<{ urlSource: string; url: string } | null> {
   const sourceFileFolder = path.dirname(sourceFile);
   const imageLocalFile = path.join(sourceFileFolder, urlSource);

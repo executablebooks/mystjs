@@ -41,9 +41,9 @@
     "myst-frontmatter": "^1.7.4",
     "myst-spec-ext": "^1.7.4",
     "myst-ext-proof": "^1.0.11",
-    "unist-util-remove": "^3.1.0",
-    "unist-util-select": "^4.0.3",
-    "vfile-reporter": "^7.0.4"
+    "unist-util-remove": "^4.0.0",
+    "unist-util-select": "^5.0.0",
+    "vfile-reporter": "^8.0.0"
   },
   "devDependencies": {
     "myst-parser": "^1.5.8"

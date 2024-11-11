@@ -471,23 +471,23 @@ cases:
       :class: my-class
       :align: right
 
-      *   *   a
+      * * a
 
-          *   b
+        * b
 
-          *   c
+        * c
 
-      *   *   1
+      * * 1
 
-          *   2
+        * 2
 
-          *   3
+        * 3
 
-      *   *   4
+      * * 4
 
-          *   5
+        * 5
 
-          *   6
+        * 6
       :::
   - title: admonition - with kind
     mdast:

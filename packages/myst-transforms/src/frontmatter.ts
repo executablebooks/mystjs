@@ -113,11 +113,6 @@ export function getFrontmatter(
       }
     }
   }
-  // Handles deleting the block if it is the only element in the block
-  const possibleNull = remove(tree, '__delete__');
-  if (possibleNull === null) {
-    // null is returned if tree itself didn’t pass the test or is cascaded away
-    remove(tree, { cascade: false }, '__delete__');
-  }
+  remove(tree, { cascade: false }, '__delete__');
   return { tree, frontmatter, identifiers };
 }

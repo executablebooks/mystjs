@@ -57,7 +57,7 @@ export function getColumnWidths(node: Table) {
   const fractionalWidths = widths.map((w: number) => w / total);
   const columnSpec = fractionalWidths.map((w: number) => renderPColumn(w)).join('');
 
-  const numColumns = widths.length > 0 ? widths.length : node?.children[0]?.children?.length ?? 0;
+  const numColumns = widths.length > 0 ? widths.length : (node?.children[0]?.children?.length ?? 0);
 
   return { widths: fractionalWidths, columnSpec, numColumns };
 }

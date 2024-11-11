@@ -40,6 +40,6 @@
     "myst-frontmatter": "^1.7.2",
     "myst-spec": "^0.0.5",
     "myst-spec-ext": "^1.7.2",
-    "unist-util-select": "^4.0.3"
+    "unist-util-select": "^5.0.0"
   }
 }

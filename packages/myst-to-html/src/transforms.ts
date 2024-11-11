@@ -3,8 +3,7 @@ import { unified } from 'unified';
 import type { Options } from 'rehype-parse';
 import rehypeParse from 'rehype-parse';
 import rehypeRemark from 'rehype-remark';
-import type { H, Handle } from 'hast-util-to-mdast';
-import { all } from 'hast-util-to-mdast';
+import type { Handle } from 'hast-util-to-mdast';
 import { visit } from 'unist-util-visit';
 import { select, selectAll } from 'unist-util-select';
 import { findAfter } from 'unist-util-find-after';
@@ -13,6 +12,7 @@ import { liftChildren, normalizeLabel, AdmonitionKind, admonitionKindToTitle } f
 import type { GenericNode, GenericParent } from 'myst-common';
 import type { EnumeratorOptions, State } from './state.js';
 import { enumerateTargets, resolveReferences } from './state.js';
+import type { TableContent, Table, Parent } from 'mdast';
 
 export type Admonition = GenericNode<{
   kind?: AdmonitionKind;
@@ -37,19 +37,26 @@ const defaultOptions: Record<keyof TransformOptions, boolean> = {
   disableEquationEnumeration: false,
 };
 
-const defaultHtmlToMdastOptions: Record<keyof HtmlToMdastOptions, any> = {
+const defaultHtmlToMdastOptions: HtmlToMdastOptions = {
   keepBreaks: true,
   htmlHandlers: {
-    table(h: H, node: any) {
-      return h(node, 'table', all(h, node));
-    },
-    th(h: H, node: any) {
-      const result = h(node, 'tableCell', all(h, node));
-      (result as GenericNode).header = true;
+    table(state, node) {
+      const result: Table = {
+        type: 'table',
+        children: state.all(node) as TableContent[],
+      };
+      state.patch(node, result);
       return result;
     },
-    _brKeep(h: H, node: any) {
-      return h(node, '_break');
+    th(state, node) {
+      const result = { type: 'tableCell', header: true, children: state.all(node) } as Parent;
+      state.patch(node, result as any);
+      return result as any;
+    },
+    _brKeep(state, node) {
+      const result = { type: '_break' } as Parent;
+      state.patch(node, result as any);
+      return result as any;
     },
   },
 };
@@ -152,7 +159,7 @@ export function convertHtmlToMdast(tree: GenericParent, opts?: HtmlToMdastOption
   return tree;
 }
 
-export const transform: Plugin<[State, TransformOptions?], string, GenericParent> =
+export const transform: Plugin<[State, TransformOptions?], GenericParent> =
   (state, o) => (tree: GenericParent) => {
     const opts = {
       ...defaultOptions,

@@ -87,7 +87,7 @@ const createGlossaryDefinitions = (tree: Root): Record<string, [string, string]>
           throw new Error(`Definition term has no associated description`);
         }
         const termText = toText(dt);
-        const descriptionText = toText(dd);
+        const descriptionText = toText(dd as GenericNode);
         return [dt.identifier, [termText, descriptionText]];
       })
       .filter((x) => x.length > 0), // remove empty
@@ -576,11 +576,17 @@ class TexSerializer implements ITexSerializer {
   }
 }
 
-const plugin: Plugin<[Options?], Root, VFile> = function (opts) {
-  this.Compiler = (node, file) => {
-    transformLegends(node);
+declare module 'unified' {
+  interface CompileResultMap {
+    VFile: VFile;
+  }
+}
 
-    const state = new TexSerializer(file, node, opts ?? { handlers });
+const plugin: Plugin<[Options?], Root, VFile> = function (opts) {
+  this.compiler = (node, file) => {
+    transformLegends(node as any);
+
+    const state = new TexSerializer(file, node as any, opts ?? { handlers });
     const tex = (file.result as string).trim();
 
     const result: LatexResult = {
@@ -597,11 +603,6 @@ const plugin: Plugin<[Options?], Root, VFile> = function (opts) {
     };
     file.result = result;
     return file;
-  };
-
-  return (node: Root) => {
-    // Preprocess
-    return node;
   };
 };
 

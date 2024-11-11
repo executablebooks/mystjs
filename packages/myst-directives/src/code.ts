@@ -1,7 +1,7 @@
 import type { Caption, Container } from 'myst-spec';
 import type { Code } from 'myst-spec-ext';
 import { nanoid } from 'nanoid';
-import yaml from 'js-yaml';
+import { load as loadYAML } from 'js-yaml';
 import type { DirectiveData, DirectiveSpec, GenericNode } from 'myst-common';
 import { fileError, fileWarn, NotebookCell, RuleId } from 'myst-common';
 import type { VFile } from 'vfile';
@@ -26,7 +26,7 @@ export function getCodeBlockOptions(
   const { options, node } = data;
   if (options?.['lineno-start'] != null && options?.['number-lines'] != null) {
     fileWarn(vfile, 'Cannot use both "lineno-start" and "number-lines"', {
-      node: select('mystDirectiveOption[name="number-lines"]', node) ?? node,
+      node: (select('mystDirectiveOption[name="number-lines"]', node) ?? node) as GenericNode,
       source: 'code-block:options',
       ruleId: RuleId.directiveOptionsCorrect,
     });
@@ -98,10 +98,10 @@ export function parseTags(input: any, vfile: VFile, node: GenericNode): string[]
   if (!input) return undefined;
   if (typeof input === 'string' && input.startsWith('[') && input.endsWith(']')) {
     try {
-      return parseTags(yaml.load(input) as string[], vfile, node);
+      return parseTags(loadYAML(input) as string[], vfile, node);
     } catch (error) {
       fileError(vfile, 'Could not load tags for code-cell directive', {
-        node: select('mystDirectiveOption[name="tags"]', node) ?? node,
+        node: (select('mystDirectiveOption[name="tags"]', node) ?? node) as GenericNode,
         source: 'code-cell:tags',
         ruleId: RuleId.directiveOptionsCorrect,
       });
@@ -124,7 +124,7 @@ export function parseTags(input: any, vfile: VFile, node: GenericNode): string[]
     }
   } else if (tags) {
     fileWarn(vfile, 'tags in code-cell directive must be a list of strings', {
-      node: select('mystDirectiveOption[name="tags"]', node) ?? node,
+      node: (select('mystDirectiveOption[name="tags"]', node) ?? node) as GenericNode,
       source: 'code-cell:tags',
       ruleId: RuleId.directiveOptionsCorrect,
     });

@@ -34,6 +34,6 @@
   "dependencies": {
     "js-yaml": "^4.1.0",
     "markdown-it": "^13.0.1",
-    "vfile": "^5.3.7"
+    "vfile": "^6.0.0"
   }
 }

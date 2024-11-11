@@ -4,10 +4,10 @@ import { liftChildren, normalizeLabel } from 'myst-common';
 import type { GenericNode, GenericParent } from 'myst-common';
 import type { Parent, TableCell } from 'myst-spec';
 import { mystToHtml } from 'myst-to-html';
-import type { Element } from 'rehype-format';
+import type { ElementContent } from 'hast';
+import { u } from 'unist-builder';
 import { fromHtml } from 'hast-util-from-html';
-import { all } from 'hast-util-to-mdast';
-import type { H, Handle } from 'hast-util-to-mdast';
+import type { Handle, NodeHandle } from 'hast-util-to-mdast';
 import { remove } from 'unist-util-remove';
 import { selectAll } from 'unist-util-select';
 import { visit } from 'unist-util-visit';
@@ -18,6 +18,7 @@ import rehypeRemark from 'rehype-remark';
 export type HtmlTransformOptions = {
   keepBreaks?: boolean;
   htmlHandlers?: { [x: string]: Handle };
+  htmlNodeHandlers?: { [x: string]: NodeHandle };
 };
 
 function convertStylesStringToObject(stringStyles: string) {
@@ -45,10 +46,7 @@ function getAlignment(alignment?: string): TableCell['align'] {
   if (alignment === 'right') return 'right';
 }
 
-function addClassAndIdentifier(
-  node: GenericNode,
-  attrs: Record<string, string | Record<string, string> | number | boolean> = {},
-) {
+function addClassAndIdentifier(node: GenericNode, attrs: Record<string, any> = {}) {
   const props = node.properties ?? {};
   if (props.id || props.dataLabel) {
     const normalized = normalizeLabel(props.id || props.dataLabel);
@@ -61,99 +59,139 @@ function addClassAndIdentifier(
   return attrs;
 }
 
-const defaultHtmlToMdastOptions: Record<keyof HtmlTransformOptions, any> = {
+const defaultHtmlToMdastOptions: HtmlTransformOptions = {
   keepBreaks: true,
+  htmlNodeHandlers: {
+    comment(state, node) {
+      // Prevents HTML comments from showing up as text in web
+      const result = u('mystComment', node.value) as any;
+      state.patch(node, result);
+      return result;
+    },
+  },
   htmlHandlers: {
-    table(h: H, node: any) {
+    table(state, node) {
       const attrs = addClassAndIdentifier(node);
-      return h(node, 'table', attrs, all(h, node));
+      const result = u('table', attrs, state.all(node) as any[]);
+      state.patch(node, result);
+      return result;
     },
-    th(h: H, node: any) {
+    th(state, node) {
       const attrs = addClassAndIdentifier(node, { header: true });
-      const rowSpan = Number.parseInt(node.properties.rowSpan, 10);
-      const colSpan = Number.parseInt(node.properties.colSpan, 10);
-      const align = getAlignment(node.properties.align);
-      if (align && align !== 'left') attrs.align = align;
-      if (Number.isInteger(rowSpan) && rowSpan > 1) attrs.rowspan = rowSpan;
-      if (Number.isInteger(colSpan) && colSpan > 1) attrs.colspan = colSpan;
-      return h(node, 'tableCell', attrs, all(h, node));
+      const { rowSpan, colSpan, align } = node.properties;
+      const rowSpanParsed = Number.parseInt(rowSpan as any, 10);
+      const colSpanParsed = Number.parseInt(colSpan as any, 10);
+      const alignParsed = getAlignment(align as any);
+      if (align && align !== 'left') attrs.align = alignParsed;
+      if (Number.isInteger(rowSpanParsed) && rowSpanParsed > 1) attrs.rowspan = rowSpanParsed;
+      if (Number.isInteger(colSpanParsed) && colSpanParsed > 1) attrs.colspan = colSpanParsed;
+      const result = u('tableCell', attrs, state.all(node) as any[]);
+      state.patch(node, result);
+      return result;
     },
-    tr(h: H, node: any) {
+    tr(state, node) {
       const attrs = addClassAndIdentifier(node);
-      return h(node, 'tableRow', attrs, all(h, node));
+      const result = u('tableRow', attrs, state.all(node) as any[]);
+      state.patch(node, result);
+      return result;
     },
-    td(h: H, node: any) {
+    td(state, node) {
       const attrs = addClassAndIdentifier(node);
-      const rowSpan = Number.parseInt(node.properties.rowSpan, 10);
-      const colSpan = Number.parseInt(node.properties.colSpan, 10);
-      const align = getAlignment(node.properties.align);
-      if (align && align !== 'left') attrs.align = align;
-      if (Number.isInteger(rowSpan) && rowSpan > 1) attrs.rowspan = rowSpan;
-      if (Number.isInteger(colSpan) && colSpan > 1) attrs.colspan = colSpan;
-      return h(node, 'tableCell', attrs, all(h, node));
+      const { rowSpan, colSpan, align } = node.properties;
+      const rowSpanParsed = Number.parseInt(rowSpan as any, 10);
+      const colSpanParsed = Number.parseInt(colSpan as any, 10);
+      const alignParsed = getAlignment(align as any);
+      if (align && align !== 'left') attrs.align = alignParsed;
+      if (Number.isInteger(rowSpanParsed) && rowSpanParsed > 1) attrs.rowspan = rowSpanParsed;
+      if (Number.isInteger(colSpanParsed) && colSpanParsed > 1) attrs.colspan = colSpanParsed;
+      const result = u('tableCell', attrs, state.all(node) as any[]);
+      state.patch(node, result);
+      return result;
     },
-    _brKeep(h: H, node: any) {
-      return h(node, '_break');
+    _brKeep(state, node) {
+      const result = u('_break') as any;
+      state.patch(node, result);
+      return result;
     },
-    span(h: H, node: any) {
+    span(state, node) {
       const attrs = addClassAndIdentifier(node);
-      return h(node, 'span', attrs, all(h, node));
+      const result = u('span', attrs, state.all(node)) as any;
+      state.patch(node, result);
+      return result;
     },
-    div(h: H, node: any) {
+    div(state, node) {
       const attrs = addClassAndIdentifier(node);
-      return h(node, 'div', attrs, all(h, node));
+      const result = u('div', attrs, state.all(node) as any[]) as any;
+      state.patch(node, result);
+      return result;
     },
-    a(h: H, node: any) {
+    a(state, node) {
       const attrs = addClassAndIdentifier(node);
       attrs.url = String(node.properties.href || '');
       if (node.properties.title) attrs.title = node.properties.title;
-      return h(node, 'link', attrs, all(h, node));
+      const result = u('link', attrs as any, state.all(node) as any);
+      state.patch(node, result);
+      return result;
     },
-    img(h: H, node: any) {
+    img(state, node) {
       const attrs = addClassAndIdentifier(node);
-      attrs.url = String(node.properties.src || '');
       if (node.properties.title) attrs.title = node.properties.title;
       if (node.properties.alt) attrs.alt = node.properties.alt;
-      return h(node, 'image', attrs);
+      const result = u('image', { ...attrs, url: String(node.properties.src || '') });
+      state.patch(node, result);
+      return result;
     },
-    video(h: H, node: any) {
+    video(state, node) {
       // Currently this creates an image node, we should change this to video in the future
       const attrs = addClassAndIdentifier(node);
-      attrs.url = String(node.properties.src || '');
       if (node.properties.title) attrs.title = node.properties.title;
       if (node.properties.alt) attrs.alt = node.properties.alt;
-      return h(node, 'image', attrs);
+      const result = u('image', { ...attrs, url: String(node.properties.src || '') });
+      state.patch(node, result);
+      return result;
     },
-    figure(h: H, node: any) {
+    figure(state, node) {
       const attrs = addClassAndIdentifier(node);
-      return h(node, 'container', attrs, all(h, node));
+      const result = u('container', attrs, state.all(node) as any[]) as any;
+      state.patch(node, result);
+      return result;
     },
-    figcaption(h: H, node: any) {
-      return h(node, 'caption', all(h, node));
+    figcaption(state, node) {
+      const result = u('caption', {}, state.all(node) as any[]) as any;
+      state.patch(node, result);
+      return result;
     },
-    comment(h: H, node: any) {
-      // Prevents HTML comments from showing up as text in web
-      return h(node, 'comment', node.value);
+    sup(state, node) {
+      const result = u('superscript', {}, state.all(node) as any[]) as any;
+      state.patch(node, result);
+      return result;
     },
-    sup(h: H, node: any) {
-      return h(node, 'superscript', all(h, node));
+    sub(state, node) {
+      const result = u('subscript', {}, state.all(node) as any[]) as any;
+      state.patch(node, result);
+      return result;
     },
-    sub(h: H, node: any) {
-      return h(node, 'subscript', all(h, node));
+    kbd(state, node) {
+      const result = u('keyboard', {}, state.all(node) as any[]) as any;
+      state.patch(node, result);
+      return result;
     },
-    kbd(h: H, node: any) {
-      return h(node, 'keyboard', all(h, node));
-    },
-    cite(h: H, node: any) {
+    cite(state, node) {
       const attrs = addClassAndIdentifier(node);
-      return attrs.label ? h(node, 'cite', attrs, all(h, node)) : all(h, node);
+      const result = attrs.label ? (u('cite', attrs, state.all(node)) as any) : state.all(node);
+      state.patch(node, result);
+      return result;
     },
-    details(h: H, node: any) {
+    details(state, node) {
       const attrs = addClassAndIdentifier(node);
-      return h(node, 'details', attrs, all(h, node));
+      const result = u('details', attrs, state.all(node)) as any;
+      state.patch(node, result);
+      return result;
     },
-    summary(h: H, node: any) {
-      return h(node, 'summary', all(h, node));
+    summary(state, node) {
+      const result = u('summary', {}, state.all(node)) as any;
+      state.patch(node, result);
+      return result;
     },
   },
 };
@@ -188,7 +226,7 @@ export function htmlTransform(tree: GenericParent, opts?: HtmlTransformOptions) 
     }
   });
   liftChildren(tree, 'htmlParsed');
-  selectAll('_break', tree).forEach((node: any) => {
+  selectAll('_break', tree).forEach((node) => {
     node.type = 'break';
   });
   return tree;
@@ -208,8 +246,8 @@ function finalizeNode(htmlOpenNodeWithChildren: GenericParent, htmlCloseNode: Ge
     {
       hast: {
         handlers: {
-          html: (h, node) => {
-            return fromHtml(node.value, { fragment: true }).children as Element[];
+          html: (_, node) => {
+            return fromHtml(node.value, { fragment: true }).children as ElementContent[];
           },
         },
       },

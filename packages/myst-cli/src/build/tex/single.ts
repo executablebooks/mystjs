@@ -60,7 +60,7 @@ export function mdastToTex(
     ...frontmatter.settings?.myst_to_tex,
   });
   const result = pipe.runSync(mdast as any);
-  const tex = pipe.stringify(result);
+  const tex = pipe.stringify(result as any);
   logMessagesFromVFile(session, tex);
   return tex.result as LatexResult;
 }

@@ -67,20 +67,20 @@ cases:
             - type: tableRow
               children:
                 - type: tableCell
+                  header: true
                   children:
                     - type: text
                       value: Person 1
-                  header: true
                 - type: tableCell
+                  header: true
                   children:
                     - type: text
                       value: Person 2
-                  header: true
                 - type: tableCell
+                  header: true
                   children:
                     - type: text
                       value: Person 3
-                  header: true
             - type: tableRow
               children:
                 - type: tableCell
