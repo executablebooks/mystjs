@@ -10,8 +10,12 @@ export function createServerLogger(session: ISession, ready: () => void): Logger
       if (line.includes('File changed: app/content')) return; // This is shown elsewhere
       if (line.includes('started at http://')) {
         const [, ipAndPort] = line.split('http://');
+        const host =
+          process.env.HOST && process.env.HOST.startsWith('http')
+            ? new URL(process.env.HOST).hostname
+            : process.env.HOST ?? 'localhost';
         const port = ipAndPort.split(':')[1].replace(/[^0-9]/g, '');
-        const local = `http://localhost:${port}`;
+        const local = `http://${host}:${port}`;
         ready();
         session.log.info(
           `\n🔌 Server started on port ${port}!  🥳 🎉\n\n\n\t👉  ${chalk.green(local)}  👈\n\n`,

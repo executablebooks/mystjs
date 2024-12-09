@@ -131,7 +131,7 @@ export async function startServer(
     watchContent(session, server.reload, opts);
   }
   if (opts.headless) {
-    const local = chalk.green(`http://localhost:${server.port}`);
+    const local = chalk.green(`http://${process.env.HOST ?? 'localhost'}:${server.port}`);
     session.log.info(
       `\n🔌 Content server started on port ${server.port}!  🥳 🎉\n\n\n\t👉  ${local}  👈\n\n`,
     );
@@ -150,6 +150,7 @@ export async function startServer(
         cwd: mystTemplate.templatePath,
         env: {
           ...process.env,
+          CONTENT_CDN_HOST: process.env.HOST ?? 'localhost',
           CONTENT_CDN_PORT: String(server.port),
           PORT: String(port),
           MODE: opts.buildStatic ? 'static' : 'app',
