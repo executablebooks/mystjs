@@ -3,7 +3,7 @@ project:
   title: JTeX
   github: https://github.com/jupyter-book/mystmd/tree/main/packages/jtex
   license: MIT
-  subject: Jinja LaTeX Templates
+  subject: Jinja Templates
 site:
   title: JTeX
   domains:

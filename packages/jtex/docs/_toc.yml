@@ -4,6 +4,7 @@ parts:
   - caption: Guide
     chapters:
       - file: create-a-latex-template
+      - file: create-a-typst-template
       - file: create-a-beamer-template
       - file: contribute-a-template
   - caption: Reference

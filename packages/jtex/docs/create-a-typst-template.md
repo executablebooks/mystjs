@@ -1,10 +1,10 @@
 ---
-title: Create a LaTeX Template
-description: jtex templates have a template.yml, template.tex, and any other images, class or definition files required for the template to render.
-thumbnail: ./thumbnails/create-a-latex-template.png
+title: Create a Typst Template
+description: jtex templates have a template.yml, template.typ, and any other images, class or definition files required for the template to render.
+thumbnail: ./thumbnails/create-a-typst-template.png
 ---
 
-A `jtex` template contains everything necessary to create a $\LaTeX$ document, including a `template.yml`, the main `template.tex`, and any associated files such as classes (`*.cls`), definitions (`*.def`), or images (`*.png`).
+A `jtex` template contains everything necessary to create a $\LaTeX$ document, including a `template.yml`, the main `template.typ`, and any associated files such as classes (`*.cls`), definitions (`*.def`), or images (`*.png`).
 These $\LaTeX$ templates are data-driven, in that they record all of the options in a `template.yml` which you create as you are working through moving your $\LaTeX$ document to a `jtex` template.
 
 ````{note} See the video tutorial 📺
@@ -17,16 +17,13 @@ These $\LaTeX$ templates are data-driven, in that they record all of the options
 To get started you will need to install `jtex` and, for convenience, [cookiecutter](https://github.com/cookiecutter/cookiecutter) which allows you to get up and started in a new repository fast!
 
 ```bash
-npm install -g jtex
-pip install cookiecutter
+pixi global install copier
 ```
 
-Once these are installed, you can clone the [`jtex` template repository](https://github.com/myst-templates/jtex-template), and go through the interactive questions on the CLI prompt.
+Once installed, you can clone the [Typst template repository](https://github.com/roaldarbol/typst-template), and go through the interactive questions on the CLI prompt.
 
 ```bash
-cookiecutter gh:myst-templates/jtex-template
-
-> title [My Template]:
+copier gh:roaldarbol/typst-template
 ```
 
 This process will create a template folder laid out as:
@@ -36,12 +33,11 @@ my_template
 ├── .github
 ├── README.md
 ├── template.yml
-├── template.tex
-├── [article.cls]
+├── template.typ
 ├── [logo.png]
 ├── thumbnail.png
-└── original
-    ├── main.tex
+└── example
+    ├── main.typ
     ├── ...
     └── sample.bib
 ```
@@ -56,9 +52,9 @@ If you need example data to create a default PDF, then store it in an `example` 
 
 To see the contents and structure of `template.yml`, see [](./template-yml.md), which defines a number of parameters and options that are available when rendering your template. The structure of the document model has standard properties, like `title`, as well as custom `template.yml` defined properties. These properties are defined in [](./document.md).
 
-## template.tex
+## template.typ
 
-The main file in your template will be `template.tex`, which should be the full journal article or index of your book.
+The main file in your template will be `template.typ`, which should be the full journal article or index of your book.
 Take a look at the defaults in the included file, it includes `[-IMPORTS-]` and `[-CONTENT-]` as well as options that turn on/off elements of the source code, for example:
 
 ```latex
@@ -77,9 +73,9 @@ After you have copied these, add to the `files:` entry in your `template.yml` (s
 
 🛠 Add the files necessary into `files` list in the `template.yml`
 
-## Template-ify your `template.tex`
+## Template-ify your `template.typ`
 
-The next thing that we will do is start to change our `template.tex` into an actual template! There are a few parts of data that are available when you render the template (see [](#template-variables)).
+The next thing that we will do is start to change our `template.typ` into an actual template! There are a few parts of data that are available when you render the template (see [](#template-variables)).
 
 These objects include:
 
@@ -131,9 +127,9 @@ jtex check
 This will tell you that certain fields were found but not defined in your `template.yml`:
 
 ```text
-template.tex
-  [parts] The template.yml does not include part "abstract" but it is referenced in template.tex on line 18
-  [doc] The template.yml does not include document property "title" but it is referenced in template.tex on line 14
+template.typ
+  [parts] The template.yml does not include part "abstract" but it is referenced in template.typ on line 18
+  [doc] The template.yml does not include document property "title" but it is referenced in template.typ on line 14
 
 jtex found warnings or errors in validating your template.
 ```
@@ -245,7 +241,7 @@ The options can be of `type:` `string`, `boolean` or `choice`. For all of your v
 
 ## Content, Imports and Packages
 
-The next sections to template are the main content section, which you can replace with `[-CONTENT-]` and a place before `\begin{document}` in your `template.tex`, put in the `[-IMPORTS-]`.
+The next sections to template are the main content section, which you can replace with `[-CONTENT-]` and a place before `\begin{document}` in your `template.typ`, put in the `[-IMPORTS-]`.
 
 The imports will be dynamically created based on your content, including any math macros that you might use.
 The imports are also not included if they are already present in your template. You can define these in the `packages` list of your `template.yml`.
@@ -325,4 +321,4 @@ You can choose to also list your template so that it is available to any one els
 See [](./contribute-a-template.md) for more information!
 ```
 
-Nice work on creating a template, share the word on [twitter](https://twitter.com/intent/tweet?text=I%20just%20created%20a%20new%20MyST%20Markdown%20template!&url=https://mystmd.org/jtex/create-a-latex-template&via=MystMarkdown), and think about [contributing your template](./contribute-a-template.md) to make it discoverable to other users!
+Nice work on creating a template, share the word on [twitter](https://twitter.com/intent/tweet?text=I%20just%20created%20a%20new%20MyST%20Markdown%20template!&url=https://mystmd.org/jtex/create-a-latex-template&via=executablebooks), and think about [contributing your template](./contribute-a-template.md) to make it discoverable to other users!
