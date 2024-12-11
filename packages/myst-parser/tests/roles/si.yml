@@ -32,3 +32,108 @@ cases:
                   unit: Hz
                   units: [hertz]
                   value: 100 Hz
+
+  - title: decimal number parses
+    markdown: '{si}`1.345e10 <\hertz>`'
+    mdast:
+      type: root
+      children:
+        - type: paragraph
+          children:
+            - type: mystRole
+              name: si
+              value: 1.345e10 <\hertz>
+              children:
+                - type: si
+                  alt: hertz
+                  number: '1.345e10'
+                  unit: Hz
+                  units: [hertz]
+                  value: 1.345e10 Hz
+
+  - title: negative decimal number parses
+    markdown: '{si}`-1.345e10 <\hertz>`'
+    mdast:
+      type: root
+      children:
+        - type: paragraph
+          children:
+            - type: mystRole
+              name: si
+              value: -1.345e10 <\hertz>
+              children:
+                - type: si
+                  alt: hertz
+                  number: '-1.345e10'
+                  unit: Hz
+                  units: [hertz]
+                  value: -1.345e10 Hz
+
+  - title: decimal number parses
+    markdown: '{si}`1.345 <\hertz>`'
+    mdast:
+      type: root
+      children:
+        - type: paragraph
+          children:
+            - type: mystRole
+              name: si
+              value: 1.345 <\hertz>
+              children:
+                - type: si
+                  alt: hertz
+                  number: '1.345'
+                  unit: Hz
+                  units: [hertz]
+                  value: 1.345 Hz
+
+  - title: exponent integer number parses
+    markdown: '{si}`1e45 <\hertz>`'
+    mdast:
+      type: root
+      children:
+        - type: paragraph
+          children:
+            - type: mystRole
+              name: si
+              value: 1e45 <\hertz>
+              children:
+                - type: si
+                  alt: hertz
+                  number: '1e45'
+                  unit: Hz
+                  units: [hertz]
+                  value: 1e45 Hz
+
+  - title: negative exponent grouped decimal number parses
+    markdown: '{si}`-1,008,000.342e45 <\hertz>`'
+    mdast:
+      type: root
+      children:
+        - type: paragraph
+          children:
+            - type: mystRole
+              name: si
+              value: -1,008,000.342e45 <\hertz>
+              children:
+                - type: si
+                  alt: hertz
+                  number: '-1,008,000.342e45'
+                  unit: Hz
+                  units: [hertz]
+                  value: -1,008,000.342e45 Hz
+
+  - title: wrongly grouped integer number errors
+    markdown: '{si}`-1.008.000,05 <\hertz>`'
+    mdast:
+      type: root
+      children:
+        - type: paragraph
+          children:
+            - type: mystRole
+              name: si
+              value: -1.008.000,05 <\hertz>
+              children:
+                - type: si
+                  error: true
+                  value: -1.008.000,05 <\hertz>

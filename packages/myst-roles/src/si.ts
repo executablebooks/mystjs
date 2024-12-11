@@ -9,11 +9,28 @@ export const siRole: RoleSpec = {
   },
   run(data: RoleData): GenericNode[] {
     const value = data.body as string;
-    const match = value.match(/([0-9]+)\s?<([\\a-zA-Z\s]+)>/);
+    const match = value.match(
+      /* In verbose regex, the following pattern looks like        e.g. -1000,000,000.192e24
+      ^
+      (-?               # Optional unary negative                  e.g. -
+          (             # <<< Decimal group
+          \d+             # Leading integers (1+)                  e.g.  1000
+              (,\d+)*     # Grouped runs of integers (0+)          e.g.     [,000,000]
+              (\.\d+)?    # Optional decimal with trailing integer e.g.             [.192]
+          )?            # Decimal is optional >>>
+          (e\d+)?       # Optional scientific exponent             e.g.                 [e24]
+      )
+      \s?
+      <([\\a-zA-Z\s]+)>
+      $
+       */
+      /^(-?(\d+(,\d+)*(\.\d+)?)?(e\d+)?)\s?<([\\a-zA-Z\s]+)>$/,
+    );
     if (!match) {
       return [{ type: 'si', error: true, value }];
     }
-    const [, number, commands] = match;
+    const number = match[1];
+    const commands = match[match.length - 1];
     const parsed = [...commands.matchAll(/\\([a-zA-Z]+)/g)];
     const units = parsed.filter((c) => !!c).map(([, c]) => c);
     const translated = units.map((c) => UNITS[c] ?? c);
