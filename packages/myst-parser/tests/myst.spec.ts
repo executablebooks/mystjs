@@ -201,14 +201,7 @@ describe('Testing mdast --> html conversions', () => {
             allowDangerousHtml: true,
           },
         });
-        // Attribute order swap does not affect the html.
-        // This change is related to a change to mdast-util-to-hast
-        // and will be upstreamed to myst-spec.
-        const i = html.replace(
-          '<h2 id="footnote-label" class="sr-only">',
-          '<h2 class="sr-only" id="footnote-label">',
-        );
-        expect(normalize(newHTML)).toEqual(normalize(i));
+        expect(normalize(newHTML)).toEqual(normalize(html));
       }
     }
   });
