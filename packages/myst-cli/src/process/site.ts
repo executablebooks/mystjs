@@ -42,7 +42,7 @@ import { combineProjectCitationRenderers } from './citations.js';
 import { loadFile, selectFile } from './file.js';
 import { loadReferences } from './loadReferences.js';
 import type { TransformFn } from './mdast.js';
-import { finalizeMdast, postProcessMdast, transformMdast } from './mdast.js';
+import { finalizeMdast, transformMdast } from './mdast.js';
 import { toSectionedParts, buildHierarchy, sectionToHeadingLevel } from './search.js';
 
 const WEB_IMAGE_EXTENSIONS = [
@@ -339,21 +339,7 @@ export function selectPageReferenceStates(
     })
     .filter((state): state is ReferenceState => !!state);
   if (!opts?.suppressWarnings) warnOnDuplicateIdentifiers(session, pageReferenceStates);
-  pages.forEach((page) => {
-    const state = cache.$internalReferences[page.file];
-    if (!state) return;
-    const { mdast } = cache.$getMdast(page.file)?.post ?? {};
-    if (!mdast) return;
-    const vfile = new VFile();
-    vfile.path = page.file;
-    buildIndexTransform(
-      mdast,
-      vfile,
-      state,
-      new MultiPageReferenceResolver(pageReferenceStates, state.filePath),
-    );
-    logMessagesFromVFile(session, vfile);
-  });
+
   return pageReferenceStates;
 }
 
@@ -405,6 +391,32 @@ export async function writeFile(
   session.log.debug(toc(`Wrote "${file}" in %s`));
 }
 
+/**
+ * A barrier synchronization primitive that blocks until a fixed number clients are waiting
+ *
+ * @param nClients - number of clients that must wait before unblocking
+ */
+export function makeBarrier(nClients: number): {
+  promise: Promise<void>;
+  wait: () => Promise<number>;
+} {
+  const ctx: { resolve?: () => void | undefined } = {};
+  const promise = new Promise<void>((resolve) => {
+    ctx.resolve = resolve;
+  });
+
+  let nWaiting = nClients;
+  const wait = async () => {
+    nWaiting--;
+    if (!nWaiting) {
+      ctx.resolve!();
+    }
+    await promise;
+    return nWaiting;
+  };
+  return { promise, wait };
+}
+
 export async function fastProcessFile(
   session: ISession,
   {
@@ -434,9 +446,48 @@ export async function fastProcessFile(
   const state = session.store.getState();
   const fileParts = selectors.selectFileParts(state, file);
   const projectParts = selectors.selectProjectParts(state, projectPath);
+
+  const allFiles = [file, ...fileParts];
+  const { wait: waitReferencing, promise: referencingPromise } = makeBarrier(allFiles.length);
+  const { wait: waitIndexing, promise: indexingPromise } = makeBarrier(allFiles.length);
+
+  // TODO: maybe move transformMdast into a multi-file function
+  const referenceStateContext: {
+    referenceStates: ReturnType<typeof selectPageReferenceStates>;
+  } = { referenceStates: [] };
+  const referencingPages = [
+    ...pages,
+    ...projectParts.map((part) => {
+      return { file: part };
+    }),
+  ];
+  referencingPromise.then(() => {
+    const pageReferenceStates = selectPageReferenceStates(session, referencingPages);
+    referenceStateContext.referenceStates.push(...pageReferenceStates);
+  });
+  indexingPromise.then(() => {
+    const cache = castSession(session);
+    referencingPages.forEach((page) => {
+      const fileState = cache.$internalReferences[page.file];
+      if (!fileState) return;
+      const { mdast } = cache.$getMdast(page.file)?.post ?? {};
+      if (!mdast) return;
+      const vfile = new VFile();
+      vfile.path = page.file;
+      buildIndexTransform(
+        mdast,
+        vfile,
+        fileState,
+        new MultiPageReferenceResolver(referenceStateContext.referenceStates, fileState.filePath),
+      );
+      logMessagesFromVFile(session, vfile);
+    });
+  });
   await Promise.all(
-    [file, ...fileParts].map(async (f) => {
+    allFiles.map(async (f) => {
       return transformMdast(session, {
+        referenceResolutionBlocker: waitReferencing,
+        indexGenerationBlocker: waitIndexing,
         file: f,
         imageExtensions: imageExtensions ?? WEB_IMAGE_EXTENSIONS,
         projectPath,
@@ -446,26 +497,15 @@ export async function fastProcessFile(
         extraTransforms,
         index: project.index,
         execute,
-      });
-    }),
-  );
-  const pageReferenceStates = selectPageReferenceStates(session, [
-    ...pages,
-    ...projectParts.map((part) => {
-      return { file: part };
-    }),
-  ]);
-  await Promise.all(
-    [file, ...fileParts].map(async (f) => {
-      return postProcessMdast(session, {
-        file: f,
-        pageReferenceStates,
         extraLinkTransformers,
+        runPostProcess: true,
+        referenceStateContext,
       });
     }),
   );
+
   await Promise.all(
-    [file, ...fileParts].map(async (f) => {
+    allFiles.map(async (f) => {
       const { mdast, frontmatter } = castSession(session).$getMdast(f)?.post ?? {};
       if (mdast) {
         await finalizeMdast(session, mdast, frontmatter ?? {}, f, {
@@ -539,10 +579,42 @@ export async function processProject(
     });
   const pagesToTransform: { file: string; slug?: string }[] = [...pages, ...projectParts];
   const usedImageExtensions = imageExtensions ?? WEB_IMAGE_EXTENSIONS;
-  // Transform all pages
+
+  const { wait: waitReferencing, promise: referencingPromise } = makeBarrier(
+    pagesToTransform.length,
+  );
+  const { wait: waitIndexing, promise: indexingPromise } = makeBarrier(pagesToTransform.length);
+
+  const referenceStateContext: {
+    referenceStates: ReturnType<typeof selectPageReferenceStates>;
+  } = { referenceStates: [] };
+  referencingPromise.then(() => {
+    const pageReferenceStates = selectPageReferenceStates(session, pagesToTransform);
+    referenceStateContext.referenceStates.push(...pageReferenceStates);
+  });
+  indexingPromise.then(() => {
+    const cache = castSession(session);
+    pagesToTransform.forEach((page) => {
+      const fileState = cache.$internalReferences[page.file];
+      if (!fileState) return;
+      const { mdast } = cache.$getMdast(page.file)?.post ?? {};
+      if (!mdast) return;
+      const vfile = new VFile();
+      vfile.path = page.file;
+      buildIndexTransform(
+        mdast,
+        vfile,
+        fileState,
+        new MultiPageReferenceResolver(referenceStateContext.referenceStates, fileState.filePath),
+      );
+      logMessagesFromVFile(session, vfile);
+    });
+  });
   await Promise.all(
-    pagesToTransform.map((page) =>
-      transformMdast(session, {
+    pagesToTransform.map(async (page) => {
+      await transformMdast(session, {
+        referenceResolutionBlocker: waitReferencing,
+        indexGenerationBlocker: waitIndexing,
         file: page.file,
         projectPath: project.path,
         projectSlug: siteProject.slug,
@@ -551,22 +623,17 @@ export async function processProject(
         watchMode,
         execute,
         extraTransforms,
-        index: project.index,
-      }),
-    ),
-  );
-  const pageReferenceStates = selectPageReferenceStates(session, pagesToTransform);
-  // Handle all cross references
-  await Promise.all(
-    pagesToTransform.map((page) =>
-      postProcessMdast(session, {
-        file: page.file,
-        checkLinks: checkLinks || strict,
-        pageReferenceStates,
         extraLinkTransformers,
-      }),
-    ),
+        checkLinks: checkLinks || strict,
+        index: project.index,
+        runPostProcess: true,
+        referenceStateContext,
+      });
+    }),
   );
+
+  ///////
+
   // Write all pages
   if (writeFiles) {
     await Promise.all(
@@ -585,7 +652,7 @@ export async function processProject(
       }),
     );
     await Promise.all(
-      pages.map(async (page) => {
+      pages.map((page) => {
         return writeFile(session, {
           file: page.file,
           projectSlug: siteProject.slug as string,
