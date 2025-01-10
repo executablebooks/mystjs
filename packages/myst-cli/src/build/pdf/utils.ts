@@ -6,6 +6,10 @@ export function isLatexmkAvailable() {
   return which.sync('latexmk', { nothrow: true });
 }
 
+export function isTectonicAvailable() {
+  return which.sync('tectonic', { nothrow: true });
+}
+
 export function isMakeglossariesAvailable() {
   return which.sync('makeglossaries', { nothrow: true });
 }

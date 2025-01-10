@@ -87,6 +87,14 @@ See the official documentation for installation instructions for $\LaTeX$ at:
 
 Ensure that you download a full distribution with appropriate libraries installed.
 
+(install-tectonic)=
+
+#### Tectonic as a lightweight alternative
+As an alternative, you can also install [Tectonic](https://tectonic-typesetting.github.io/), "a modernized, complete, self-contained TeX/LaTeX engine, powered by XeTeX and TeXLive".<br>
+> Tectonic automatically downloads support files so you don’t have to install a full LaTeX system in order to start using it. If you start using a new LaTeX package, Tectonic just pulls down the files it needs and continues processing.
+>
+> – [Tectonic Website](https://tectonic-typesetting.github.io/)
+
 % Probably a note in the future about running this remotely?
 
 (rendering-pdfs-with-typst)=

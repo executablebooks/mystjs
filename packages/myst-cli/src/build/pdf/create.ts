@@ -14,7 +14,7 @@ import { uniqueArray } from '../../utils/uniqueArray.js';
 import { logMessagesFromVFile } from '../../utils/logging.js';
 import { createTempFolder } from '../../utils/createTempFolder.js';
 import { cleanOutput } from '../utils/cleanOutput.js';
-import { isLatexmkAvailable, isMakeglossariesAvailable } from './utils.js';
+import { isTectonicAvailable, isLatexmkAvailable, isMakeglossariesAvailable } from './utils.js';
 
 const copyFile = util.promisify(fs.copyFile);
 
@@ -263,10 +263,10 @@ async function runPdfBuildCommand(
   vfile: VFile,
   debugLogsOnly?: boolean,
 ) {
-  if (!isLatexmkAvailable()) {
+  if (!(isTectonicAvailable() || isLatexmkAvailable())) {
     fileError(
       vfile,
-      `⚠️  The "latexmk" command is not available. See documentation on installing LaTeX:\n\n${docLinks.installLatex}`,
+      `⚠️  Neither "tectonic" nor "latexmk" command is available. See documentation on installing LaTeX:\n\n${docLinks.installLatex}\n${docLinks.installTectonic}`,
       { ruleId: RuleId.pdfBuildCommandsAvailable },
     );
   }
