@@ -136,7 +136,17 @@ export async function buildHtml(session: ISession, opts: StartOptions) {
   fs.mkdirSync(htmlDir, { recursive: true });
   const appServer = await startServer(session, { ...opts, buildStatic: true, baseurl });
   if (!appServer) return;
-  const host = `http://localhost:${appServer.port}`;
+
+  const host = process.env.HOST;
+  if (processEnvHost) {
+    session.log.info(`Building the site with a host of "${processEnvHost}"`);
+  } else {
+    session.log.info(
+      'Building the base site.\nTo set a host use "HOST" environment variable.',
+    );
+  }
+  const host = `http://${processEnvHost}:${appServer.port}`;
+
   const routes = await currentSiteRoutes(session, host, baseurl, opts);
 
   // Fetch all HTML pages and assets by the template
