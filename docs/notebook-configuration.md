@@ -27,10 +27,21 @@ In Markdown of a jupyter notebook these look like:
 
 ````markdown
 ```{code-cell} python
-:tags: remove-input
+:tag: remove-input
 print("This will show output with no input!")
 ```
 ````
+
+for a single tag, or
+
+````markdown
+```{code-cell} python
+:tags: [my-tag1, my-tag2]
+print("This will show output with no input!")
+```
+````
+
+for any number of tags.
 
 :::{table} Notebook cell tags with special meanings
 :label: tbl:notebook-cell-tags

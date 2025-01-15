@@ -116,7 +116,7 @@ For example, the following code defines a `remove-input` tag (See all [notebook 
 
 ````markdown
 ```{code-cell} python
-:tags: remove-input
+:tag: remove-input
 print("This will show output with no input!")
 ```
 ````
@@ -124,14 +124,14 @@ print("This will show output with no input!")
 and results in the following:
 
 > ```{code-cell} python
-> :tags: remove-input
+> :tag: remove-input
 > print("This will show output with no input!")
 > ```
 
 This can be particularly helpful for showing the output of a calculation or plot, which is reproducible in the {download}`source code <./notebooks-with-markdown.md>`, but not shown to the user like this `matplotlib` plot:
 
 ```{code-cell} python
-:tags: remove-input
+:tag: remove-input
 # Data for plotting
 t = np.arange(0.0, 2.0, 0.01)
 s = 1 + np.sin(2 * np.pi * t)
@@ -149,12 +149,12 @@ plt.show()
 
 For **multiple tags** you have two ways to provide them:
 
-- If you specify argument options with `:`, tags will be parsed as a comma-separated string.
+- If you specify argument options with `:`, tags will be parsed as a comma-separated list of strings.
   For example:
 
   ````markdown
   ```{code-cell} python
-  :tags: tag1, tag2,tag3
+  :tags: [tag1, tag2,tag3]
   # Note that whitespace is removed from tags!
   print("howdy!")
   ```
