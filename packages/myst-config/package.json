@@ -1,6 +1,6 @@
 {
   "name": "myst-config",
-  "version": "1.7.6",
+  "version": "1.7.7",
   "license": "MIT",
   "description": "Project and site config types and validation for the mystmd ecosystem",
   "author": "Franklin Koch <franklin@curvenote.com>",
@@ -31,8 +31,8 @@
     "url": "https://github.com/jupyter-book/mystmd/issues"
   },
   "dependencies": {
-    "myst-common": "^1.7.6",
-    "myst-frontmatter": "^1.7.6",
+    "myst-common": "^1.7.7",
+    "myst-frontmatter": "^1.7.7",
     "simple-validators": "^1.1.0"
   },
   "devDependencies": {
