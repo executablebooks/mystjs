@@ -284,6 +284,8 @@ export type Link = SpecLink & {
   static?: true;
   protocol?: string;
   error?: true;
+  kind?: 'button';
+  class?: Image['class'];
 };
 
 // Search types

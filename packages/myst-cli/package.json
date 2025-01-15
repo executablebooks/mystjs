@@ -72,6 +72,7 @@
     "myst-common": "^1.7.6",
     "myst-config": "^1.7.6",
     "myst-execute": "^0.1.2",
+    "myst-ext-button": "^0.0.0",
     "myst-ext-card": "^1.0.9",
     "myst-ext-exercise": "^1.0.9",
     "myst-ext-grid": "^1.0.9",

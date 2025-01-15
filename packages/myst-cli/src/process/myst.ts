@@ -1,4 +1,5 @@
 import { mystParse } from 'myst-parser';
+import { buttonRole } from 'myst-ext-button';
 import { cardDirective } from 'myst-ext-card';
 import { gridDirectives } from 'myst-ext-grid';
 import { proofDirective } from 'myst-ext-proof';
@@ -47,7 +48,7 @@ export function parseMyst(
     extensions: {
       frontmatter: !opts?.ignoreFrontmatter,
     },
-    roles: [...(session.plugins?.roles ?? [])],
+    roles: [buttonRole, ...(session.plugins?.roles ?? [])],
     vfile,
   });
   logMessagesFromVFile(session, vfile);
