@@ -44,6 +44,10 @@ function isPlaceholder(node: GenericNode) {
   return node.type === 'image' && node.placeholder;
 }
 
+function isStatic(node: GenericNode) {
+  return node.type === 'image' && node.static;
+}
+
 /** Nest node inside container */
 function createSubfigure(node: GenericNode, parent: GenericParent): GenericParent {
   const children = node.type === 'container' && node.children ? node.children : [node];
@@ -130,6 +134,7 @@ export function containerChildrenTransform(tree: GenericParent, vfile: VFile) {
     hoistContentOutOfParagraphs(container);
     let subfigures: GenericNode[] = [];
     let placeholderImage: GenericNode | undefined;
+    let staticImage: GenericNode | undefined;
     let caption: GenericNode | undefined;
     let legend: GenericNode | undefined;
     const otherNodes: GenericNode[] = [];
@@ -161,6 +166,15 @@ export function containerChildrenTransform(tree: GenericParent, vfile: VFile) {
         } else {
           placeholderImage = child;
         }
+      } else if (isStatic(child)) {
+        if (staticImage) {
+          fileError(vfile, 'container has multiple static images', {
+            node: container,
+            ruleId: RuleId.containerChildrenValid,
+          });
+        } else {
+          staticImage = child;
+        }
       } else if (SUBFIGURE_TYPES.includes(child.type)) {
         subfigures.push(child);
       } else {
@@ -186,6 +200,7 @@ export function containerChildrenTransform(tree: GenericParent, vfile: VFile) {
         caption ? 'caption' : undefined,
         legend ? 'legend' : undefined,
         placeholderImage ? 'placeholder image' : undefined,
+        staticImage ? 'static image' : undefined,
       ]
         .filter(Boolean)
         .join(', ');
@@ -206,6 +221,7 @@ export function containerChildrenTransform(tree: GenericParent, vfile: VFile) {
     }
     const children: GenericNode[] = [...subfigures];
     if (placeholderImage) children.push(placeholderImage);
+    if (staticImage) children.push(staticImage);
     // Caption is above tables and below all other figures
     if (container.kind === 'table') {
       if (caption) children.unshift(caption);

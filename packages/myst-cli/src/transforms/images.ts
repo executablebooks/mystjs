@@ -747,6 +747,45 @@ export function transformPlaceholderImages(
 }
 
 /**
+ * Remove all static images
+ *
+ * This should only be run for web builds
+ */
+export function removeStaticImages(mdast: GenericParent) {
+  selectAll('image', mdast)
+    .filter((image: GenericNode) => image.static)
+    .forEach((image: GenericNode) => {
+      image.type = '__remove__';
+    });
+  remove(mdast, '__remove__');
+}
+
+/**
+ * Remove all figure content except static/placeholder, where present
+ *
+ * This should only be run for static builds
+ */
+export function removeNonStaticImages(mdast: GenericParent) {
+  const containers = selectAll('container', mdast);
+  containers.forEach((container: GenericNode) => {
+    const hasStatic = !!container.children?.find((child) => child.static);
+    const hasPlaceholder = !!container.children?.find((child) => child.placeholder);
+    if (!hasStatic && !hasPlaceholder) return;
+    container.children = container.children?.filter((child) => {
+      if (['caption', 'legend'].includes(child.type)) {
+        // Always keep caption/legend
+        return true;
+      }
+      if (hasStatic) {
+        // Prioritize static image over placeholder
+        return !!child.static;
+      }
+      return !!child.placeholder;
+    });
+  });
+}
+
+/**
  * Trim base64 values for urlSource when they have been replaced by image urls
  */
 export async function transformDeleteBase64UrlSource(mdast: GenericParent) {

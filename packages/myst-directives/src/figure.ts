@@ -56,6 +56,10 @@ export const figureDirective: DirectiveSpec = {
       type: String,
       doc: 'A placeholder image when using a notebook cell as the figure contents. This will be shown in place of the Jupyter output until an execution environment is attached. It will also be used in static outputs, such as a PDF output.',
     },
+    static: {
+      type: String,
+      doc: 'An image only used in static outputs. This image will always take priority for static outputs, such as PDFs, and will never be used in dynamic outputs, such as web builds.',
+    },
     'no-subfigures': {
       type: Boolean,
       doc: 'Disallow implicit subfigure creation from child nodes',
@@ -90,6 +94,17 @@ export const figureDirective: DirectiveSpec = {
         type: 'image',
         placeholder: true,
         url: data.options.placeholder as string,
+        alt: data.options?.alt as string,
+        width: data.options?.width as string,
+        height: data.options?.height as string,
+        align: data.options?.align as Image['align'],
+      });
+    }
+    if (data.options?.static) {
+      children.push({
+        type: 'image',
+        static: true,
+        url: data.options.static as string,
         alt: data.options?.alt as string,
         width: data.options?.width as string,
         height: data.options?.height as string,

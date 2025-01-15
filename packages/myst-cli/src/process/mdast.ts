@@ -68,6 +68,8 @@ import {
   transformFilterOutputStreams,
   transformLiftCodeBlocksInJupytext,
   transformMystXRefs,
+  removeStaticImages,
+  removeNonStaticImages,
 } from '../transforms/index.js';
 import type { ImageExtensions } from '../utils/resolveExtension.js';
 import { logMessagesFromVFile } from '../utils/logging.js';
@@ -379,10 +381,13 @@ export async function finalizeMdast(
   const vfile = new VFile(); // Collect errors on this file
   vfile.path = file;
   if (simplifyFigures) {
+    removeNonStaticImages(mdast);
     // Transform output nodes to images / text
     reduceOutputs(session, mdast, file, imageWriteFolder, {
       altOutputFolder: simplifyFigures ? undefined : imageAltOutputFolder,
     });
+  } else {
+    removeStaticImages(mdast);
   }
   transformOutputsToFile(session, mdast, imageWriteFolder, {
     altOutputFolder: simplifyFigures ? undefined : imageAltOutputFolder,
