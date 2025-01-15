@@ -1,5 +1,15 @@
 # myst-to-jats
 
+## 1.0.32
+
+### Patch Changes
+
+- 415ed13: Update DOI utils to ensure a `.` is present after the 10
+- Updated dependencies [415ed13]
+  - myst-frontmatter@1.7.7
+  - myst-common@1.7.7
+  - myst-spec-ext@1.7.7
+
 ## 1.0.31
 
 ### Patch Changes

@@ -1,5 +1,21 @@
 # myst-cli
 
+## 1.3.21
+
+### Patch Changes
+
+- 884bd8d4: Change from twitter to bluesky
+- 415ed13: Update DOI utils to ensure a `.` is present after the 10
+- a4b5d484: Update comment in gh action
+- Updated dependencies [415ed13]
+- Updated dependencies [7f29af8a]
+  - myst-frontmatter@1.7.7
+  - myst-to-jats@1.0.32
+  - myst-to-typst@0.0.30
+  - myst-common@1.7.7
+  - myst-config@1.7.7
+  - myst-spec-ext@1.7.7
+
 ## 1.3.20
 
 ### Patch Changes

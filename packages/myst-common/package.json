@@ -1,7 +1,7 @@
 {
   "name": "myst-common",
   "sideEffects": false,
-  "version": "1.7.6",
+  "version": "1.7.7",
   "type": "module",
   "exports": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "mdast": "^3.0.0",
-    "myst-frontmatter": "^1.7.6",
+    "myst-frontmatter": "^1.7.7",
     "myst-spec": "^0.0.5",
     "nanoid": "^4.0.0",
     "unified": "^10.1.2",
@@ -31,7 +31,7 @@
     "vfile-message": "^3.0.0"
   },
   "devDependencies": {
-    "myst-spec-ext": "^1.7.6",
+    "myst-spec-ext": "^1.7.7",
     "unist-builder": "3.0.0",
     "@jupyterlab/nbformat": "^3.5.2",
     "@lumino/coreutils": "^2.0.0"

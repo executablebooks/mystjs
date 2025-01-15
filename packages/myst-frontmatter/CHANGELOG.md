@@ -1,5 +1,11 @@
 # myst-frontmatter
 
+## 1.7.7
+
+### Patch Changes
+
+- 415ed13: Update DOI utils to ensure a `.` is present after the 10
+
 ## 1.7.6
 
 ### Patch Changes
