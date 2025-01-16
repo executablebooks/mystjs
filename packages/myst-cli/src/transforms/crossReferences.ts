@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import type { VFile } from 'vfile';
 import { selectAll } from 'unist-util-select';
 import type { FrontmatterParts, GenericNode, GenericParent, References } from 'myst-common';
@@ -7,13 +8,17 @@ import { addChildrenFromTargetNode } from 'myst-transforms';
 import type { PageFrontmatter } from 'myst-frontmatter';
 import type { CrossReference, Dependency, Link, SourceFileKind } from 'myst-spec-ext';
 import type { ISession } from '../session/types.js';
-import { loadFromCache, writeToCache } from '../session/cache.js';
+import { loadFromCache, writeToCache, checkCache, cachePath } from '../session/cache.js';
 import type { SiteAction, SiteExport } from 'myst-config';
 
 export const XREF_MAX_AGE = 1; // in days
 
 function mystDataFilename(dataUrl: string) {
   return `myst-${computeHash(dataUrl)}.json`;
+}
+
+export function mystXRefsCacheFilename(url: string) {
+  return `xrefs-myst-${computeHash(url)}.json`;
 }
 
 export type MystData = {
@@ -74,12 +79,93 @@ export async function fetchMystLinkData(session: ISession, node: Link, vfile: VF
   return fetchMystData(session, node.dataUrl, node.urlSource, vfile);
 }
 
+const MYST_SPEC_VERSION = '0';
+
+function upgradeMystData(version: string, data: any): MystData {
+  return data;
+}
+
+async function stepwiseDowngrade(
+  session: ISession,
+  fromVersion: string,
+  toVersion: string,
+  vfile: VFile,
+  data: any,
+): Promise<any> {
+  const downgradeCachePath = `myst-downgrade-${fromVersion}-${toVersion}.mjs`;
+  if (
+    !checkCache(session, downgradeCachePath, {
+      maxAge: 7, // days
+    })
+  ) {
+    try {
+      const response = await fetch(`http://localhost:9000/${downgradeCachePath}`);
+      const body = await response.text();
+      fs.writeFileSync(cachePath(session, downgradeCachePath), body);
+    } catch (err) {
+      fileWarn(
+        vfile,
+        `Unable to load utility for downgrading XRef from ${fromVersion} to ${toVersion}`,
+      );
+      return data;
+    }
+  }
+
+  const module = await import(cachePath(session, downgradeCachePath));
+  return module.default(data);
+}
+
+async function downgradeMystData(
+  session: ISession,
+  version: string,
+  vfile: VFile,
+  data: any,
+): Promise<MystData> {
+  const fromVersion = parseInt(version);
+  const toVersion = parseInt(MYST_SPEC_VERSION);
+  for (let stepVersion = fromVersion; stepVersion !== toVersion; stepVersion--) {
+    data = await stepwiseDowngrade(session, `${version}`, `${stepVersion - 1}`, vfile, data);
+  }
+  return data;
+}
+
 export async function fetchMystXRefData(session: ISession, node: CrossReference, vfile: VFile) {
   let dataUrl: string | undefined;
   if (node.remoteBaseUrl && node.dataUrl) {
     dataUrl = `${node.remoteBaseUrl}${node.dataUrl}`;
   }
-  return fetchMystData(session, dataUrl, node.urlSource, vfile);
+  const rawData = await fetchMystData(session, dataUrl, node.urlSource, vfile);
+  let data: MystData | undefined;
+  if (node.remoteBaseUrl && !!rawData) {
+    // Retrieve the external xref information to determine the spec version
+    const cachePath = mystXRefsCacheFilename(node.remoteBaseUrl);
+    const mystXRefData = loadFromCache(session, cachePath, {
+      maxAge: XREF_MAX_AGE,
+    });
+    if (!mystXRefData) {
+      fileWarn(vfile, `Unable to load external MyST reference data: ${node.remoteBaseUrl}`);
+    }
+    // Bring potentially incompatible schema into-alignment
+    else {
+      const { version } = JSON.parse(mystXRefData) as { version: string };
+      if (version === MYST_SPEC_VERSION) {
+        data = rawData;
+      } else if (parseInt(version) < parseInt(MYST_SPEC_VERSION)) {
+        data = upgradeMystData(version, rawData);
+      } else {
+        console.log(`Upgrading xref ${node.urlSource} with version ${version}`);
+        data = await downgradeMystData(session, version, vfile, rawData);
+      }
+    }
+    data = rawData;
+  } else {
+    fileWarn(
+      vfile,
+      `Unable to determine XRef AST version for external MyST reference: ${node.urlSource}`,
+    );
+    data = rawData;
+  }
+  return data;
 }
 
 export function nodesFromMystXRefData(

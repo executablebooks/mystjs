@@ -15,13 +15,11 @@ import {
 } from '../session/cache.js';
 import type { ISession } from '../session/types.js';
 import { selectors } from '../store/index.js';
-import { XREF_MAX_AGE } from '../transforms/crossReferences.js';
+import { XREF_MAX_AGE, mystXRefsCacheFilename } from '../transforms/crossReferences.js';
 import { dirname } from 'node:path';
 
-function inventoryCacheFilename(refKind: 'intersphinx' | 'myst', id: string, path: string) {
-  const hashcontent = `${id}${path}`;
-  const ext = refKind === 'intersphinx' ? 'inv' : 'json';
-  return `xrefs-${refKind}-${computeHash(hashcontent)}.${ext}`;
+function sphinxInventoryCacheFilename(path: string) {
+  return `xrefs-intersphinx-${computeHash(path)}.inv`;
 }
 
 async function preloadReference(session: ISession, key: string, reference: ExternalReference) {
@@ -31,11 +29,11 @@ async function preloadReference(session: ISession, key: string, reference: Exter
     kind: reference.kind,
   };
   const toc = tic();
-  const mystXRefFilename = inventoryCacheFilename('myst', key, reference.url);
+  const mystXRefFilename = mystXRefsCacheFilename(reference.url);
   const mystXRefData = loadFromCache(session, mystXRefFilename, {
     maxAge: XREF_MAX_AGE,
   });
-  const intersphinxFilename = inventoryCacheFilename('intersphinx', key, reference.url);
+  const intersphinxFilename = sphinxInventoryCacheFilename(reference.url);
   if ((!ref.kind || ref.kind === 'myst') && !!mystXRefData) {
     session.log.debug(`Loading cached inventory file for ${reference.url}: ${mystXRefFilename}`);
     const xrefs = JSON.parse(mystXRefData);
@@ -93,11 +91,7 @@ async function loadReference(
       reference.kind = 'myst';
       const mystXRefs = (await mystXRefsResp?.json()) as MystXRefs;
       session.log.debug(`Saving remote myst xref file to cache: ${reference.url}`);
-      writeToCache(
-        session,
-        inventoryCacheFilename('myst', reference.key, reference.url),
-        JSON.stringify(mystXRefs),
-      );
+      writeToCache(session, mystXRefsCacheFilename(reference.url), JSON.stringify(mystXRefs));
       reference.value = mystXRefs;
       session.log.info(
         toc(`🏫 Read ${mystXRefs.references.length} myst references for "${reference.key}" in %s.`),
@@ -132,10 +126,7 @@ async function loadReference(
     reference.kind = 'intersphinx';
     reference.value = inventory;
     if (inventory.id && inventory.path && isUrl(inventory.path)) {
-      const intersphinxPath = cachePath(
-        session,
-        inventoryCacheFilename('intersphinx', inventory.id, inventory.path),
-      );
+      const intersphinxPath = cachePath(session, sphinxInventoryCacheFilename(inventory.path));
       if (!fs.existsSync(intersphinxPath)) {
         session.log.debug(`Saving remote inventory file to cache: ${inventory.path}`);
         fs.mkdirSync(dirname(intersphinxPath), { recursive: true });
