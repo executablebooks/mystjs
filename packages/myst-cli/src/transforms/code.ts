@@ -1,6 +1,6 @@
 import type { GenericNode, GenericParent } from 'myst-common';
 import { NotebookCellTags, RuleId, fileError, fileWarn } from 'myst-common';
-import type { Image, Output } from 'myst-spec-ext';
+import type { Image, Outputs } from 'myst-spec-ext';
 import { select, selectAll } from 'unist-util-select';
 import yaml from 'js-yaml';
 import type { VFile } from 'vfile';
@@ -156,10 +156,9 @@ export function propagateBlockDataToCode(session: ISession, vfile: VFile, mdast:
   const blocks = selectAll('block', mdast) as GenericNode[];
   blocks.forEach((block) => {
     if (!block.data) return;
-    const outputNode = select('output', block) as Output | null;
-    if (block.data.placeholder && outputNode) {
-      if (!outputNode.children) outputNode.children = [];
-      outputNode.children.push({
+    const outputsNode = select('outputs', block) as Outputs | null;
+    if (block.data.placeholder && outputsNode) {
+      outputsNode.children.push({
         type: 'image',
         placeholder: true,
         url: block.data.placeholder as string,
@@ -195,10 +194,10 @@ export function propagateBlockDataToCode(session: ISession, vfile: VFile, mdast:
           if (codeNode) codeNode.visibility = 'remove';
           break;
         case NotebookCellTags.hideOutput:
-          if (outputNode) outputNode.visibility = 'hide';
+          if (outputsNode) outputsNode.visibility = 'hide';
           break;
         case NotebookCellTags.removeOutput:
-          if (outputNode) outputNode.visibility = 'remove';
+          if (outputsNode) outputsNode.visibility = 'remove';
           break;
         default:
           session.log.debug(`tag '${tag}' is not valid in code-cell tags'`);
@@ -206,7 +205,7 @@ export function propagateBlockDataToCode(session: ISession, vfile: VFile, mdast:
     });
     if (!block.visibility) block.visibility = 'show';
     if (codeNode && !codeNode.visibility) codeNode.visibility = 'show';
-    if (outputNode && !outputNode.visibility) outputNode.visibility = 'show';
+    if (outputsNode && !outputsNode.visibility) outputsNode.visibility = 'show';
   });
 }
 

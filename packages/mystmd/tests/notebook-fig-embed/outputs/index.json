@@ -55,6 +55,30 @@
             "children": [
               {
                 "type": "output",
+                 "_future_ast": {
+                   "children": [
+                     {
+                       "jupyter_data": {
+                         "data": {
+                           "text/html": {
+                             "content_type": "text/html",
+                             "hash": "a16fcedcd26437c820ccfc05d1f48a57",
+                             "path": "/a16fcedcd26437c820ccfc05d1f48a57.html"
+                           },
+                           "text/plain": {
+                             "content": "alt.Chart(...)",
+                             "content_type": "text/plain"
+                           }
+                         },
+                         "execution_count": 2,
+                         "metadata": {},
+                         "output_type": "execute_result"
+                       },
+                       "type": "output"
+                     }
+                   ],
+                   "type": "outputs"
+                 },
                 "data": [
                   {
                     "output_type": "execute_result",
@@ -144,6 +168,30 @@
               },
               {
                 "type": "output",
+                "_future_ast": {
+                  "children": [
+                    {
+                      "jupyter_data": {
+                        "data": {
+                          "text/html": {
+                            "content_type": "text/html",
+                            "hash": "a16fcedcd26437c820ccfc05d1f48a57",
+                            "path": "/a16fcedcd26437c820ccfc05d1f48a57.html"
+                          },
+                          "text/plain": {
+                            "content": "alt.Chart(...)",
+                            "content_type": "text/plain"
+                          }
+                        },
+                        "execution_count": 2,
+                        "metadata": {},
+                        "output_type": "execute_result"
+                      },
+                      "type": "output"
+                    }
+                  ],
+                  "type": "outputs"
+                },
                 "data": [
                   {
                     "output_type": "execute_result",
@@ -190,6 +238,32 @@
             "children": [
               {
                 "type": "output",
+                "_future_ast": {
+                  "children": [
+                    {
+                      "children": [],
+                      "jupyter_data": {
+                        "data": {
+                          "text/html": {
+                            "content_type": "text/html",
+                            "hash": "a85dae82213ec48ea05754a345bab5ce",
+                            "path": "https://cdn.curvenote.com/01944f0b-783c-7ea2-8d19-f59b784cd49e/public/a85dae82213ec48ea05754a345bab5ce.html"
+                          },
+                          "text/plain": {
+                            "content": "alt.VConcatChart(...)",
+                            "content_type": "text/plain"
+                          }
+                        },
+                        "execution_count": 2,
+                        "metadata": {},
+                        "output_type": "execute_result"
+                      },
+                      "type": "output"
+                    }
+                  ],
+                  "type": "outputs",
+                  "visibility": "show"
+                },
                 "data": [
                   {
                     "output_type": "execute_result",
@@ -286,6 +360,33 @@
               },
               {
                 "type": "output",
+                "_future_ast": {
+                  "children": [
+                    {
+                      "children": [],
+                      "jupyter_data": {
+                        "data": {
+                          "text/html": {
+                            "content_type": "text/html",
+                            "hash": "a85dae82213ec48ea05754a345bab5ce",
+                            "path": "https://cdn.curvenote.com/01944f0b-783c-7ea2-8d19-f59b784cd49e/public/a85dae82213ec48ea05754a345bab5ce.html"
+                          },
+                          "text/plain": {
+                            "content": "alt.VConcatChart(...)",
+                            "content_type": "text/plain"
+                          }
+                        },
+                        "execution_count": 2,
+                        "metadata": {},
+                        "output_type": "execute_result"
+                      },
+                      "type": "output"
+                    }
+                  ],
+                  "type": "outputs",
+                  "visibility": "show"
+                },
+
                 "data": [
                   {
                     "output_type": "execute_result",

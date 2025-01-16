@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { computeHash } from 'myst-cli-utils';
-import type { Image, SourceFileKind } from 'myst-spec-ext';
+import type { Image, SourceFileKind, Output } from 'myst-spec-ext';
 import { liftChildren, fileError, RuleId, fileWarn } from 'myst-common';
 import type { GenericNode, GenericParent } from 'myst-common';
 import type { ProjectSettings } from 'myst-frontmatter';
@@ -34,17 +34,29 @@ export async function transformOutputsToCache(
   kind: SourceFileKind,
   opts?: { minifyMaxCharacters?: number },
 ) {
-  const outputs = selectAll('output', mdast) as GenericNode[];
-  if (!outputs.length) return;
+  const outputsNodes = selectAll('outputs', mdast) as GenericNode[];
+  if (!outputsNodes.length) return;
   const cache = castSession(session);
   await Promise.all(
-    outputs
-      .filter((output) => output.visibility !== 'remove')
+    outputsNodes
+      // Ignore outputs that are hidden
+      .filter((outputs) => outputs.visibility !== 'remove')
+      // Pull out children
+      .map((outputs) => outputs.children as Output[])
+      .flat()
+      // Filter outputs with no data
+      // TODO: can this ever occur?
+      .filter((output) => (output as any).jupyter_data !== undefined)
+      // Minify output data
       .map(async (output) => {
-        output.data = await minifyCellOutput(output.data as IOutput[], cache.$outputs, {
-          computeHash,
-          maxCharacters: opts?.minifyMaxCharacters,
-        });
+        [(output as any).jupyter_data] = await minifyCellOutput(
+          [(output as any).jupyter_data] as IOutput[],
+          cache.$outputs,
+          {
+            computeHash,
+            maxCharacters: opts?.minifyMaxCharacters,
+          },
+        );
       }),
   );
 }
@@ -75,9 +87,10 @@ export function transformFilterOutputStreams(
     const blockRemoveStderr = tags.includes('remove-stderr');
     const blockRemoveStdout = tags.includes('remove-stdout');
     const outputs = selectAll('output', block) as GenericNode[];
-    // There should be only one output in the block
-    outputs.forEach((output) => {
-      output.data = output.data.filter((data: IStream | MinifiedMimeOutput) => {
+    outputs
+      .filter((output) => {
+        const data = output.jupyter_data;
+
         if (
           (stderr !== 'show' || blockRemoveStderr) &&
           data.output_type === 'stream' &&
@@ -96,7 +109,7 @@ export function transformFilterOutputStreams(
               },
             );
           }
-          return !doRemove;
+          return doRemove;
         }
         if (
           (stdout !== 'show' || blockRemoveStdout) &&
@@ -116,7 +129,7 @@ export function transformFilterOutputStreams(
               },
             );
           }
-          return !doRemove;
+          return doRemove;
         }
         if (
           mpl !== 'show' &&
@@ -141,12 +154,15 @@ export function transformFilterOutputStreams(
               },
             );
           }
-          return !doRemove;
+          return doRemove;
         }
-        return true;
+        return false;
+      })
+      .forEach((output) => {
+        output.type = '__delete__';
       });
-    });
   });
+  remove(mdast, { cascade: false }, '__delete__');
 }
 
 function writeCachedOutputToFile(
@@ -192,16 +208,19 @@ export function transformOutputsToFile(
   const outputs = selectAll('output', mdast) as GenericNode[];
   const cache = castSession(session);
 
-  outputs.forEach((node) => {
-    walkOutputs(node.data, (obj) => {
-      const { hash } = obj;
-      if (!hash || !cache.$outputs[hash]) return undefined;
-      obj.path = writeCachedOutputToFile(session, hash, cache.$outputs[hash], writeFolder, {
-        ...opts,
-        node,
+  outputs
+    .filter((output) => !!output.jupyter_data)
+    .forEach((node) => {
+      // TODO: output-refactoring -- drop to single output in future
+      walkOutputs([node.jupyter_data], (obj) => {
+        const { hash } = obj;
+        if (!hash || !cache.$outputs[hash]) return undefined;
+        obj.path = writeCachedOutputToFile(session, hash, cache.$outputs[hash], writeFolder, {
+          ...opts,
+          node,
+        });
       });
     });
-  });
 }
 
 /**
@@ -233,87 +252,92 @@ export function reduceOutputs(
   writeFolder: string,
   opts?: { altOutputFolder?: string; vfile?: VFile },
 ) {
-  const outputs = selectAll('output', mdast) as GenericNode[];
+  const outputsNodes = selectAll('outputs', mdast) as GenericNode[];
   const cache = castSession(session);
-  outputs.forEach((node) => {
-    if (node.visibility === 'remove' || node.visibility === 'hide') {
-      // Hidden nodes should not show up in simplified outputs for static export
-      node.type = '__delete__';
-      return;
-    }
-    if (!node.data?.length && !node.children?.length) {
-      node.type = '__delete__';
-      return;
-    }
-    node.type = '__lift__';
-    if (node.children?.length) return;
-    const selectedOutputs: { content_type: string; hash: string }[] = [];
-    node.data.forEach((output: MinifiedOutput) => {
-      let selectedOutput: { content_type: string; hash: string } | undefined;
-      walkOutputs([output], (obj: any) => {
-        const { output_type, content_type, hash } = obj;
-        if (!hash) return undefined;
-        if (!selectedOutput || isPreferredOutputType(content_type, selectedOutput.content_type)) {
-          if (['error', 'stream'].includes(output_type)) {
-            selectedOutput = { content_type: 'text/plain', hash };
-          } else if (typeof content_type === 'string') {
-            if (
-              content_type.startsWith('image/') ||
-              content_type === 'text/plain' ||
-              content_type === 'text/html'
-            ) {
-              selectedOutput = { content_type, hash };
+  outputsNodes.forEach((outputsNode) => {
+    const outputs = outputsNode.children as GenericNode[];
+
+    outputs.forEach((outputNode) => {
+      if (outputNode.visibility === 'remove' || outputNode.visibility === 'hide') {
+        // Hidden nodes should not show up in simplified outputs for static export
+        outputNode.type = '__delete__';
+        return;
+      }
+      if (!outputNode.jupyter_data && !outputNode.children?.length) {
+        outputNode.type = '__delete__';
+        return;
+      }
+      outputNode.type = '__lift__';
+      if (outputNode.children?.length) return;
+      const selectedOutputs: { content_type: string; hash: string }[] = [];
+      if (outputNode.jupyter_data) {
+        const output = outputNode.jupyter_data;
+
+        let selectedOutput: { content_type: string; hash: string } | undefined;
+        walkOutputs([output], (obj: any) => {
+          const { output_type, content_type, hash } = obj;
+          if (!hash) return undefined;
+          if (!selectedOutput || isPreferredOutputType(content_type, selectedOutput.content_type)) {
+            if (['error', 'stream'].includes(output_type)) {
+              selectedOutput = { content_type: 'text/plain', hash };
+            } else if (typeof content_type === 'string') {
+              if (
+                content_type.startsWith('image/') ||
+                content_type === 'text/plain' ||
+                content_type === 'text/html'
+              ) {
+                selectedOutput = { content_type, hash };
+              }
             }
           }
-        }
-      });
-      if (selectedOutput) selectedOutputs.push(selectedOutput);
-    });
-    const children: (Image | GenericNode)[] = selectedOutputs
-      .map((output): Image | GenericNode | GenericNode[] | undefined => {
-        const { content_type, hash } = output ?? {};
-        if (!hash || !cache.$outputs[hash]) return undefined;
-        if (content_type === 'text/html') {
-          const htmlTree = {
-            type: 'root',
-            children: [
-              {
-                type: 'html',
-                value: cache.$outputs[hash][0],
-              },
-            ],
-          };
-          htmlTransform(htmlTree);
-          if ((selectAll('image', htmlTree) as GenericNode[]).find((htmlImage) => !htmlImage.url)) {
-            return undefined;
+        });
+        if (selectedOutput) selectedOutputs.push(selectedOutput);
+      }
+      const children: (Image | GenericNode)[] = selectedOutputs
+        .map((output): Image | GenericNode | GenericNode[] | undefined => {
+          const { content_type, hash } = output ?? {};
+          if (!hash || !cache.$outputs[hash]) return undefined;
+          if (content_type === 'text/html') {
+            const htmlTree = {
+              type: 'root',
+              children: [
+                {
+                  type: 'html',
+                  value: cache.$outputs[hash][0],
+                },
+              ],
+            };
+            htmlTransform(htmlTree);
+            return htmlTree.children;
+          } else if (content_type.startsWith('image/')) {
+            const path = writeCachedOutputToFile(session, hash, cache.$outputs[hash], writeFolder, {
+              ...opts,
+              node: outputNode,
+            });
+            if (!path) return undefined;
+            const relativePath = relative(dirname(file), path);
+            return {
+              type: 'image',
+              data: { type: 'output' },
+              url: relativePath,
+              urlSource: relativePath,
+            };
+          } else if (content_type === 'text/plain' && cache.$outputs[hash]) {
+            const [content] = cache.$outputs[hash];
+            return {
+              type: 'code',
+              data: { type: 'output' },
+              value: stripAnsi(content),
+            };
           }
-          return htmlTree.children;
-        } else if (content_type.startsWith('image/')) {
-          const path = writeCachedOutputToFile(session, hash, cache.$outputs[hash], writeFolder, {
-            ...opts,
-            node,
-          });
-          if (!path) return undefined;
-          const relativePath = relative(dirname(file), path);
-          return {
-            type: 'image',
-            data: { type: 'output' },
-            url: relativePath,
-            urlSource: relativePath,
-          };
-        } else if (content_type === 'text/plain' && cache.$outputs[hash]) {
-          const [content] = cache.$outputs[hash];
-          return {
-            type: 'code',
-            data: { type: 'output' },
-            value: stripAnsi(content),
-          };
-        }
-        return undefined;
-      })
-      .flat()
-      .filter((output): output is Image | GenericNode => !!output);
-    node.children = children;
+          return undefined;
+        })
+        .flat()
+        .filter((output): output is Image | GenericNode => !!output);
+      outputNode.children = children;
+    });
+    // Erase the outputs node
+    outputsNode.type = '__lift__';
   });
   remove(mdast, '__delete__');
   liftChildren(mdast, '__lift__');

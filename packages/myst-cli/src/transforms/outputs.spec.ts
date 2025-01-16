@@ -20,9 +20,14 @@ describe('reduceOutputs', () => {
               ],
             },
             {
-              type: 'output',
-              id: 'abc123',
-              data: [],
+              type: 'outputs',
+              children: [
+                {
+                  type: 'output',
+                  id: 'abc123',
+                  jupyter_data: null,
+                },
+              ],
             },
           ],
         },
@@ -49,18 +54,21 @@ describe('reduceOutputs', () => {
               ],
             },
             {
-              type: 'output',
+              type: 'outputs',
               id: 'abc123',
-              data: [
+              children: [
                 {
-                  output_type: 'display_data',
-                  execution_count: 3,
-                  metadata: {},
-                  data: {
-                    'application/octet-stream': {
-                      content_type: 'application/octet-stream',
-                      hash: 'def456',
-                      path: '/my/path/def456.png',
+                  type: 'output',
+                  jupyter_data: {
+                    output_type: 'display_data',
+                    execution_count: 3,
+                    metadata: {},
+                    data: {
+                      'application/octet-stream': {
+                        content_type: 'application/octet-stream',
+                        hash: 'def456',
+                        path: '/my/path/def456.png',
+                      },
                     },
                   },
                 },
@@ -91,14 +99,19 @@ describe('reduceOutputs', () => {
               ],
             },
             {
-              type: 'output',
+              type: 'outputs',
               id: 'abc123',
-              data: [],
               children: [
                 {
-                  type: 'image',
-                  placeholder: true,
-                  url: 'placeholder.png',
+                  type: 'output',
+                  jupyter_data: null,
+                  children: [
+                    {
+                      type: 'image',
+                      placeholder: true,
+                      url: 'placeholder.png',
+                    },
+                  ],
                 },
               ],
             },

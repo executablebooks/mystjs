@@ -27,22 +27,18 @@ cases:
             - type: block
               kind: notebook-code
               data:
-                id: nb-cell-0
-              identifier: nb-cell-0
-              label: nb-cell-0
-              html_id: nb-cell-0
+
               children:
                 - type: code
                   lang: python
                   executable: true
                   value: print('abc')
-                  identifier: nb-cell-0-code
                   enumerator: 1
-                  html_id: nb-cell-0-code
-                - type: output
-                  id: T7FMDqDm8dM2bOT1tKeeM
-                  identifier: nb-cell-0-output
-                  html_id: nb-cell-0-output
+                - type: outputs
+                  children:
+                    - type: output
+                      children: []
+
     after:
       type: root
       children:
@@ -54,27 +50,22 @@ cases:
             - type: block
               kind: notebook-code
               data:
-                id: nb-cell-0
-              identifier: nb-cell-0
-              label: nb-cell-0
-              html_id: nb-cell-0
+
               children:
                 - type: code
                   lang: python
                   executable: true
                   value: print('abc')
-                  identifier: nb-cell-0-code
                   enumerator: 1
-                  html_id: nb-cell-0-code
-                - type: output
-                  id: T7FMDqDm8dM2bOT1tKeeM
-                  identifier: nb-cell-0-output
-                  html_id: nb-cell-0-output
-                  data:
-                    - output_type: stream
-                      name: stdout
-                      text: |
-                        abc
+                - type: outputs
+                  children:
+                    - type: output
+                      children: []
+                      jupyter_data:
+                          output_type: stream
+                          name: stdout
+                          text: |
+                            abc
   - title: tree with inline expression is evaluated
     before:
       type: root
@@ -115,100 +106,72 @@ cases:
         - type: block
           kind: notebook-code
           data:
-            id: nb-cell-0
-          identifier: nb-cell-0
-          label: nb-cell-0
-          html_id: nb-cell-0
           children:
             - type: code
               lang: python
               executable: true
               value: print('abc')
-              identifier: nb-cell-0-code
               enumerator: 1
-              html_id: nb-cell-0-code
-            - type: output
-              id: T7FMDqDm8dM2bOT1tKeeM
-              identifier: nb-cell-0-output
-              html_id: nb-cell-0-output
-              data:
+            - type: outputs
+              children:
+                - type: output
+                  jupyter_data:
         - type: block
           kind: notebook-code
           data:
-            id: nb-cell-0
-          identifier: nb-cell-0
-          label: nb-cell-0
-          html_id: nb-cell-0
           children:
             - type: code
               lang: python
               executable: true
               value: raise ValueError
-              identifier: nb-cell-0-code
               enumerator: 1
-              html_id: nb-cell-0-code
-            - type: output
-              id: T7FMDqDm8dM2bOT1tKeeM
-              identifier: nb-cell-0-output
-              html_id: nb-cell-0-output
-              data:
+            - type: outputs
+              children:
+                - type: output
+                  jupyter_data:
     after:
       type: root
       children:
         - type: block
           kind: notebook-code
           data:
-            id: nb-cell-0
-          identifier: nb-cell-0
-          label: nb-cell-0
-          html_id: nb-cell-0
           children:
             - type: code
               lang: python
               executable: true
               value: print('abc')
-              identifier: nb-cell-0-code
               enumerator: 1
-              html_id: nb-cell-0-code
-            - type: output
-              id: T7FMDqDm8dM2bOT1tKeeM
-              identifier: nb-cell-0-output
-              html_id: nb-cell-0-output
-              data:
-                - output_type: stream
-                  name: stdout
-                  text: |
-                    abc
+            - type: outputs
+              children:
+                - type: output
+                  jupyter_data:
+                      output_type: stream
+                      name: stdout
+                      text: |
+                        abc
         - type: block
           kind: notebook-code
           data:
-            id: nb-cell-0
-          identifier: nb-cell-0
-          label: nb-cell-0
-          html_id: nb-cell-0
           children:
             - type: code
               lang: python
               executable: true
               value: raise ValueError
-              identifier: nb-cell-0-code
               enumerator: 1
-              html_id: nb-cell-0-code
-            - type: output
-              id: T7FMDqDm8dM2bOT1tKeeM
-              identifier: nb-cell-0-output
-              html_id: nb-cell-0-output
-              data:
-                - output_type: error
-                  # Note this traceback can be different on various machines
-                  # Not including it means we still validate an error, just don't care about the traceback
-                  # traceback:
-                  #   - "\e[0;31m---------------------------------------------------------------------------\e[0m"
-                  #   - "\e[0;31mValueError\e[0m                                Traceback (most recent call last)"
-                  #   - "Cell \e[0;32mIn[2], line 1\e[0m\n\e[0;32m----> 1\e[0m \e[38;5;28;01mraise\e[39;00m \e[38;5;167;01mValueError\e[39;00m\n"
-                  #   - "\e[0;31mValueError\e[0m: "
-                  ename: ValueError
-                  evalue: ''
+            - type: outputs
+              children:
+                - type: output
+                  jupyter_data:
+                      output_type: error
+                      # Note this traceback can be different on various machines
+                      # Not including it means we still validate an error, just don't care about the traceback
+                      # traceback:
+                      #   - "\e[0;31m---------------------------------------------------------------------------\e[0m"
+                      #   - "\e[0;31mValueError\e[0m                                Traceback (most recent call last)"
+                      #   - "Cell \e[0;32mIn[2], line 1\e[0m\n\e[0;32m----> 1\e[0m \e[38;5;28;01mraise\e[39;00m \e[38;5;167;01mValueError\e[39;00m\n"
+                      #   - "\e[0;31mValueError\e[0m: "
+                      ename: ValueError
+                      evalue: ''
   - title: tree with bad executable code and `raises-exception` is evaluated and passes
     before:
       type: root
@@ -216,58 +179,44 @@ cases:
         - type: block
           kind: notebook-code
           data:
-            id: nb-cell-0
             tags: raises-exception
-          identifier: nb-cell-0
-          label: nb-cell-0
-          html_id: nb-cell-0
           children:
             - type: code
               lang: python
               executable: true
               value: raise ValueError
-              identifier: nb-cell-0-code
               enumerator: 1
-              html_id: nb-cell-0-code
-            - type: output
-              id: T7FMDqDm8dM2bOT1tKeeM
-              identifier: nb-cell-0-output
-              html_id: nb-cell-0-output
-              data:
+            - type: outputs
+              children:
+                - type: output
+                  jupyter_data:
     after:
       type: root
       children:
         - type: block
           kind: notebook-code
           data:
-            id: nb-cell-0
             tags: raises-exception
-          identifier: nb-cell-0
-          label: nb-cell-0
-          html_id: nb-cell-0
           children:
             - type: code
               lang: python
               executable: true
               value: raise ValueError
-              identifier: nb-cell-0-code
               enumerator: 1
-              html_id: nb-cell-0-code
-            - type: output
-              id: T7FMDqDm8dM2bOT1tKeeM
-              identifier: nb-cell-0-output
-              html_id: nb-cell-0-output
-              data:
-                - output_type: error
-                  # Note this traceback can be different on various machines
-                  # Not including it means we still validate an error, just don't care about the traceback
-                  # traceback:
-                  #   - "\e[0;31m---------------------------------------------------------------------------\e[0m"
-                  #   - "\e[0;31mValueError\e[0m                                Traceback (most recent call last)"
-                  #   - "Cell \e[0;32mIn[2], line 1\e[0m\n\e[0;32m----> 1\e[0m \e[38;5;28;01mraise\e[39;00m \e[38;5;167;01mValueError\e[39;00m\n"
-                  #   - "\e[0;31mValueError\e[0m: "
-                  ename: ValueError
-                  evalue: ''
+            - type: outputs
+              children:
+                - type: output
+                  jupyter_data:
+                      output_type: error
+                      # Note this traceback can be different on various machines
+                      # Not including it means we still validate an error, just don't care about the traceback
+                      # traceback:
+                      #   - "\e[0;31m---------------------------------------------------------------------------\e[0m"
+                      #   - "\e[0;31mValueError\e[0m                                Traceback (most recent call last)"
+                      #   - "Cell \e[0;32mIn[2], line 1\e[0m\n\e[0;32m----> 1\e[0m \e[38;5;28;01mraise\e[39;00m \e[38;5;167;01mValueError\e[39;00m\n"
+                      #   - "\e[0;31mValueError\e[0m: "
+                      ename: ValueError
+                      evalue: ''
   - title: tree with bad executable code and `skip-execution` is not evaluated
     before:
       type: root
@@ -275,45 +224,31 @@ cases:
         - type: block
           kind: notebook-code
           data:
-            id: nb-cell-0
             tags: skip-execution
-          identifier: nb-cell-0
-          label: nb-cell-0
-          html_id: nb-cell-0
           children:
             - type: code
               lang: python
               executable: true
               value: raise ValueError
-              identifier: nb-cell-0-code
               enumerator: 1
-              html_id: nb-cell-0-code
-            - type: output
-              id: T7FMDqDm8dM2bOT1tKeeM
-              identifier: nb-cell-0-output
-              html_id: nb-cell-0-output
-              data:
+            - type: outputs
+              children:
+                - type: output
+                  jupyter_data:
     after:
       type: root
       children:
         - type: block
           kind: notebook-code
           data:
-            id: nb-cell-0
             tags: skip-execution
-          identifier: nb-cell-0
-          label: nb-cell-0
-          html_id: nb-cell-0
           children:
             - type: code
               lang: python
               executable: true
               value: raise ValueError
-              identifier: nb-cell-0-code
               enumerator: 1
-              html_id: nb-cell-0-code
-            - type: output
-              id: T7FMDqDm8dM2bOT1tKeeM
-              identifier: nb-cell-0-output
-              html_id: nb-cell-0-output
-              data:
+            - type: outputs
+              children:
+                - type: output
+                  jupyter_data:

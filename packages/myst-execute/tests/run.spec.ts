@@ -96,6 +96,7 @@ casesList.forEach(({ title, cases }) => {
             expect.arrayContaining([expect.stringMatching(throws)]),
           );
         }
+        console.log(JSON.stringify(after, null, 2));
         expect(before).toMatchObject(after);
       },
       { timeout: 30_000 },

@@ -1,0 +1,30 @@
+{
+  "name": "myst-compat",
+  "sideEffects": false,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "clean": "rimraf dist",
+    "lint": "eslint \"src/**/!(*.spec).ts\" -c ./.eslintrc.cjs",
+    "lint:format": "prettier --check \"src/**/*.{ts,tsx,md}\"",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "build:esm": "tsc",
+    "build": "npm-run-all -l clean -p build:esm"
+  },
+  "dependencies": {
+    "unist-util-select": "^4.0.3",
+    "unist-util-visit": "^4.1.2",
+    "vfile": "^5.0.0",
+    "vfile-message": "^3.0.0"
+  },
+  "devDependencies": {
+    "@jupyterlab/nbformat": "^3.5.2"
+  }
+}

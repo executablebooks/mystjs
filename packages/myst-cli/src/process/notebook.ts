@@ -165,17 +165,21 @@ export async function processNotebookFull(
           value: ensureString(cell.source),
         };
 
-        // Embed outputs in an output block
-        const output: { type: 'output'; id: string; data: IOutput[] } = {
-          type: 'output',
+        const outputsChildren = (cell.outputs as IOutput[]).map((output) => {
+          // Embed outputs in an output block
+          const result = {
+            type: 'output',
+            jupyter_data: output,
+            children: [],
+          };
+          return result;
+        });
+        const outputs = {
+          type: 'outputs',
           id: nanoid(),
-          data: [],
+          children: outputsChildren,
         };
-
-        if (cell.outputs && (cell.outputs as IOutput[]).length > 0) {
-          output.data = cell.outputs as IOutput[];
-        }
-        return acc.concat(blockParent(cell, [code, output]));
+        return acc.concat(blockParent(cell, [code, outputs]));
       }
       return acc;
     },

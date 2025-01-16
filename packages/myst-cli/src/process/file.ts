@@ -9,12 +9,13 @@ import type { GenericParent } from 'myst-common';
 import { RuleId, toText, fileError, fileWarn } from 'myst-common';
 import type { PageFrontmatter } from 'myst-frontmatter';
 import { validatePageFrontmatter, fillProjectFrontmatter } from 'myst-frontmatter';
-import { SourceFileKind } from 'myst-spec-ext';
+import { SourceFileKind, VERSION } from 'myst-spec-ext';
 import { frontmatterValidationOpts, getPageFrontmatter } from '../frontmatter.js';
 import type { ISession, ISessionWithCache } from '../session/types.js';
 import { castSession } from '../session/cache.js';
 import { config, projects, warnings, watch } from '../store/reducers.js';
 import type { PreRendererData, RendererData } from '../transforms/types.js';
+import { makeCompatible } from 'myst-compat';
 import { logMessagesFromVFile } from '../utils/logging.js';
 import { isValidFile, parseFilePath } from '../utils/resolveExtension.js';
 import { addWarningForFile } from '../utils/addWarningForFile.js';
@@ -22,7 +23,13 @@ import { loadBibTeXCitationRenderers } from './citations.js';
 import { parseMyst } from './myst.js';
 import { processNotebookFull } from './notebook.js';
 import { selectors } from '../store/index.js';
-import { defined, incrementOptions, validateObjectKeys, validateEnum } from 'simple-validators';
+import {
+  defined,
+  incrementOptions,
+  validateObjectKeys,
+  validateEnum,
+  validateString,
+} from 'simple-validators';
 import type { ValidationOptions } from 'simple-validators';
 
 type LoadFileOptions = {
@@ -144,10 +151,12 @@ export function mystJSONValidationOpts(
 function validateMySTJSON(
   input: any,
   opts: ValidationOptions,
-): { mdast: GenericParent; kind: SourceFileKind; frontmatter: PageFrontmatter } | undefined {
+):
+  | { mdast: GenericParent; kind: SourceFileKind; frontmatter: PageFrontmatter; version: string }
+  | undefined {
   const value = validateObjectKeys(
     input,
-    { required: ['mdast'], optional: ['kind', 'frontmatter'] },
+    { required: ['mdast'], optional: ['kind', 'frontmatter', 'version'] },
     opts,
   );
   if (value === undefined) {
@@ -156,6 +165,7 @@ function validateMySTJSON(
 
   const { mdast } = value;
 
+  // Check kind
   let kind: undefined | SourceFileKind;
   if (defined(value.kind)) {
     kind = validateEnum<SourceFileKind>(value.kind, {
@@ -163,15 +173,31 @@ function validateMySTJSON(
       enum: SourceFileKind,
     });
   }
+
+  // Check frontmatter
   let frontmatter: undefined | PageFrontmatter;
   if (defined(value.frontmatter)) {
     frontmatter = validatePageFrontmatter(value.frontmatter, incrementOptions('frontmatter', opts));
   }
 
+  let version: undefined | string;
+  if (defined(value.version)) {
+    version = validateString(value.version, incrementOptions('version', opts));
+    // Need a valid version if given
+    if (version === undefined) {
+      return undefined;
+    }
+  }
+  version = version ?? '1';
+
+  // Ingest "legacy" mdast and upgrade it
+  makeCompatible(version, '2', mdast);
+
   return {
     mdast,
     kind: kind ?? SourceFileKind.Article,
     frontmatter: frontmatter ?? {},
+    version: version,
   };
 }
 

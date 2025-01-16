@@ -209,15 +209,14 @@ export const codeCellDirective: DirectiveSpec = {
       executable: true,
       value: (data.body ?? '') as string,
     };
-    const output = {
-      type: 'output',
-      id: nanoid(),
-      data: [],
+    const outputs = {
+      type: 'outputs',
+      children: [],
     };
     const block: GenericNode = {
       type: 'block',
       kind: NotebookCell.code,
-      children: [code, output],
+      children: [code, outputs],
       data: {},
     };
     addCommonDirectiveOptions(data, block);

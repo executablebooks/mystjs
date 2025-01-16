@@ -70,6 +70,7 @@
     "mime-types": "^2.1.35",
     "myst-cli-utils": "^2.0.11",
     "myst-common": "^1.7.6",
+    "myst-compat": "^0.0.0",
     "myst-config": "^1.7.6",
     "myst-execute": "^0.1.2",
     "myst-ext-card": "^1.0.9",
