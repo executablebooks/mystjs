@@ -4,18 +4,16 @@ import type { GenericParent, IExpressionResult, PluginUtils, References } from '
 import { fileError, fileWarn, RuleId, slugToUrl } from 'myst-common';
 import type { PageFrontmatter } from 'myst-frontmatter';
 import { SourceFileKind } from 'myst-spec-ext';
-import type { LinkTransformer } from 'myst-transforms';
+import type { LinkTransformer, ReferenceState } from 'myst-transforms';
 import {
   basicTransformationsPlugin,
   htmlPlugin,
   footnotesPlugin,
-  ReferenceState,
   MultiPageReferenceResolver,
   resolveLinksAndCitationsTransform,
   resolveReferencesTransform,
   mathPlugin,
   codePlugin,
-  enumerateTargetsPlugin,
   keysTransform,
   linksTransform,
   MystTransformer,
@@ -97,14 +95,6 @@ export type TransformFn = (
   opts: Parameters<typeof transformMdast>[1],
 ) => Promise<void>;
 
-function referenceFileFromPartFile(session: ISession, partFile: string) {
-  const state = session.store.getState();
-  const partDeps = selectors.selectDependentFiles(state, partFile);
-  if (partDeps.length > 0) return partDeps[0];
-  const file = selectors.selectFileFromPart(state, partFile);
-  return file ?? partFile;
-}
-
 export async function transformMdast(
   session: ISession,
   opts: {
@@ -119,6 +109,7 @@ export async function transformMdast(
     minifyMaxCharacters?: number;
     index?: string;
     titleDepth?: number;
+    offset?: number;
   },
 ) {
   const {
@@ -131,7 +122,8 @@ export async function transformMdast(
     watchMode = false,
     minifyMaxCharacters,
     index,
-    titleDepth,
+    titleDepth, // Related to title set in markdown, rather than frontmatter
+    offset, // Related to multi-page nesting
     execute,
   } = opts;
   const toc = tic();
@@ -167,16 +159,14 @@ export async function transformMdast(
     },
     projectPath,
   );
+  if (offset) {
+    if (!frontmatter.numbering) frontmatter.numbering = {};
+    if (!frontmatter.numbering.title) frontmatter.numbering.title = {};
+    if (frontmatter.numbering.title.offset == null) frontmatter.numbering.title.offset = offset;
+  }
   const references: References = {
     cite: { order: [], data: {} },
   };
-  const refFile = kind === SourceFileKind.Part ? referenceFileFromPartFile(session, file) : file;
-  const state = new ReferenceState(refFile, {
-    numbering: frontmatter.numbering,
-    identifiers,
-    vfile,
-  });
-  cache.$internalReferences[file] = state;
   // Import additional content from mdast or other files
   importMdastFromJson(session, file, mdast);
   await includeFilesTransform(session, file, mdast, frontmatter, vfile);
@@ -192,16 +182,18 @@ export async function transformMdast(
       firstDepth: (titleDepth ?? 1) + (frontmatter.content_includes_title ? 0 : 1),
     })
     .use(inlineMathSimplificationPlugin)
-    .use(mathPlugin, { macros: frontmatter.math })
-    .use(glossaryPlugin) // This should be before the enumerate plugins
-    .use(abbreviationPlugin, { abbreviations: frontmatter.abbreviations })
-    .use(indexIdentifierPlugin)
-    .use(enumerateTargetsPlugin, { state }); // This should be after math/container transforms
+    .use(mathPlugin, { macros: frontmatter.math });
   // Load custom transform plugins
   session.plugins?.transforms.forEach((t) => {
     if (t.stage !== 'document') return;
     pipe.use(t.plugin, undefined, pluginUtils);
   });
+
+  pipe
+    .use(glossaryPlugin) // This should be before the enumerate plugins
+    .use(abbreviationPlugin, { abbreviations: frontmatter.abbreviations })
+    .use(indexIdentifierPlugin);
+
   await pipe.run(mdast, vfile);
 
   // This needs to come after basic transformations since meta tags are added there
@@ -272,6 +264,7 @@ export async function transformMdast(
     frontmatter,
     mdast,
     references,
+    identifiers,
     widgets,
   } as any;
   const cachedMdast = cache.$getMdast(file);
@@ -297,7 +290,7 @@ export async function postProcessMdast(
   }: {
     file: string;
     checkLinks?: boolean;
-    pageReferenceStates?: ReferenceState[];
+    pageReferenceStates: ReferenceState[];
     extraLinkTransformers?: LinkTransformer[];
   },
 ) {
@@ -309,10 +302,7 @@ export async function postProcessMdast(
   const vfile = new VFile(); // Collect errors on this file
   vfile.path = file;
   const { mdast, dependencies, frontmatter } = mdastPost;
-  const fileState = cache.$internalReferences[file];
-  const state = pageReferenceStates
-    ? new MultiPageReferenceResolver(pageReferenceStates, file, vfile)
-    : fileState;
+  const state = new MultiPageReferenceResolver(pageReferenceStates, file, vfile);
   const externalReferences = Object.values(cache.$externalReferences);
   // NOTE: This is doing things in place, we should potentially make this a different state?
   const transformers = [
@@ -327,12 +317,12 @@ export async function postProcessMdast(
     new StaticFileTransformer(session, file), // Links static files and internally linked files
   ];
   resolveLinksAndCitationsTransform(mdast, { state, transformers });
-  linksTransform(mdast, state.vfile as VFile, {
+  linksTransform(mdast, vfile, {
     transformers,
     selector: LINKS_SELECTOR,
   });
   await transformLinkedRORs(session, vfile, mdast, file);
-  resolveReferencesTransform(mdast, state.vfile as VFile, { state, transformers });
+  resolveReferencesTransform(mdast, vfile, { state, transformers });
   await transformMystXRefs(session, vfile, mdast, frontmatter);
   await embedTransform(session, mdast, file, dependencies, state);
   const pipe = unified();
@@ -345,7 +335,6 @@ export async function postProcessMdast(
   // Ensure there are keys on every node after post processing
   keysTransform(mdast);
   checkLinkTextTransform(mdast, externalReferences, vfile);
-  logMessagesFromVFile(session, fileState.vfile);
   logMessagesFromVFile(session, vfile);
   log.debug(toc(`Transformed mdast cross references and links for "${file}" in %s`));
   if (checkLinks) await checkLinksTransform(session, file, mdast);

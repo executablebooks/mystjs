@@ -145,7 +145,13 @@ export async function transformMystXRefs(
           maxNodes: 1,
         });
         if (targets?.length) {
-          addChildrenFromTargetNode(node as any, targets[0] as any, frontmatter.numbering, vfile);
+          addChildrenFromTargetNode(
+            node as any,
+            targets[0] as any,
+            frontmatter.numbering,
+            vfile,
+            frontmatter.numbering?.title?.offset,
+          );
         }
       }
       number += 1;

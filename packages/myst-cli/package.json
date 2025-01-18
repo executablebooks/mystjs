@@ -46,7 +46,7 @@
     "@reduxjs/toolkit": "^2.1.0",
     "adm-zip": "^0.5.10",
     "boxen": "^7.1.1",
-    "cffjs": "^0.0.1",
+    "cffjs": "^0.0.2",
     "chalk": "^5.2.0",
     "check-node-version": "^4.2.1",
     "chokidar": "^3.5.3",

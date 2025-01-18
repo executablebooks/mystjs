@@ -9,12 +9,19 @@ import type { GenericNode, GenericParent } from './types.js';
  * Doing so will make this function obsolete
  *
  * This function only returns false if node `type` equals one of:
- * crossReferences, citations, footnoteDefinition, and footnoteReference.
+ * crossReferences, citations, footnoteDefinition, footnoteReference, captionNumber.
  *
  * It does not actually check if the node has `identifier`.
  */
 export function isTargetIdentifierNode(node: { type: string }) {
-  const nonTargetTypes = ['crossReference', 'cite', 'footnoteDefinition', 'footnoteReference'];
+  const nonTargetTypes = [
+    'crossReference',
+    'cite',
+    'footnoteDefinition',
+    'footnoteReference',
+    'captionNumber',
+    'link',
+  ];
   return !nonTargetTypes.includes(node.type);
 }
 

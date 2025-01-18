@@ -315,7 +315,10 @@ Please see [this paragraph](#my-paragraph) and [these points](#my-points).
 
 ## Numbering
 
-Frontmatter may specify `numbering` to customize how various components of the page are numbered. By default, numbering is enabled for figures, equations, tables, math, and code blocks; it is disabled for headings and other content types contained on the page.
+Frontmatter may specify `numbering` to customize how various components of the page are numbered. By default, numbering is enabled for figures, equations, tables, math, and code blocks; it is disabled for headings and other content types contained on the page. Additionally, by default, numbering resets on every page.
+
+### Enabling and Disabling Numbering
+
 To enable numbering of all content, you may simply use:
 
 ```yaml
@@ -337,16 +340,9 @@ numbering:
   headings: true
 ```
 
-For components with numbering enabled you may specify `start` to begin counting at a number other than 1 and `template` to redefine how the component will render when referenced in the text. For this example, the figures on the page will start with `Figure 5` and when referenced in the text they will appear as "fig (5)"
-
-```yaml
-numbering:
-  figure:
-    start: 5
-    template: fig (%s)
-```
-
 Numbering may be used for `figure` as above, as well as `subfigure`, `equation`, `subequation`, `table`, `code`, `headings` (for all heading depths), and `heading_1` through `heading_6` (for modifying each depth separately).
+
+### Numbering Custom Content
 
 You may also add numbering for custom content kinds:
 
@@ -365,7 +361,9 @@ This figure will be numbered as "Box 1"
 :::
 ```
 
-Finally, under the `numbering` object, you may specify `enumerator`. For now, this applies to all numberings on the page. Instead of enumerating as simply 1, 2, 3... they will follow the template set in `enumerator`. For example, in Appendix 1, you may want to use the following `numbering` so content is enumerated as A1.1, A1.2, A1.3...
+### Customizing Numbering Appearance
+
+By default, all components are numbered sequentially as 1, 2, 3... However, under the `numbering` object, you may specify `enumerator`. For now, this applies to all numberings on the page. Instead of enumerating as simply 1, 2, 3... they will follow the template set in `enumerator`. For example, in Appendix 1, you may want to use the following `numbering` so content is enumerated as A1.1, A1.2, A1.3...
 
 ```yaml
 numbering:
@@ -373,3 +371,72 @@ numbering:
 ```
 
 If you want to control the numbering for a specific figure, you can use the {myst:directive}`figure.enumerator` option. This will give the figure a specific enumerator, and will not increment the counting for other figures. This is helpful if you want to explicitly count figure `2a` and then carry on counting figures as normal; alternatively you can take control of numbering entirely by setting {myst:directive}`figure.enumerator` on every figure.
+
+You may also redefine how the component will render when referenced in the text by specifying `template`. For this example, the figures on the page will start with `Figure 1` and when referenced in the text they will appear as "fig (1)"
+
+```yaml
+numbering:
+  figure:
+    template: fig (%s)
+```
+
+### Continuous Numbering
+
+By default, numbering will reset on every page. However, you may enable continuous numbering across all pages by specifying `continue: true` in your `numbering` object. If this is specified on a single page, it will continue counting from the previous page; if specified in your `myst.yml`, counting will be continuous across the entire project.
+
+```yaml
+numbering:
+  figure:
+    continue: true
+```
+
+You may also override the `start` value to begin counting on the page at a specific number. This is useful, for example, if you want continuous figure numbering across your project until you reach your appendix, then you want to reset to A1:
+
+```yaml
+numbering:
+  enumerator: A%s
+  figure:
+    start: 1
+```
+
+### Title Numbering
+
+By default, page titles are not numbered, even if you turn on all numbering with `numbering: true`. However, you may add `title` to your numbering object:
+
+```yaml
+numbering:
+  title: true
+```
+
+Doing so will enumerate all the titles in your MyST project. These numberings will follow the structure of your table of contents. So, given the structure:
+
+```yaml
+toc:
+  - file: index.md
+  - file: section_a.md
+    children:
+      - file: chapter_1.md
+      - file: chapter_2.md
+  - file: section_b.md
+```
+
+The numbering will be: `1 - index.md`, `2 - section_a.md`, `2.1 - chapter_1.md`, `2.2 - chapter_2.md`, and `3 - section_b.md`.
+
+If both `title` and `heading` numbering are enabled, these will be incremented together. So, for the example above, if there is a single heading of level 1 in `section_a.md`, it will increment the same count as the title of `chapter_1.md` and `chapter_2.md` (i.e. the heading will be `2.1` and the chapters will be `2.2` and `2.3`):
+
+```yaml
+numbering:
+  title: true
+  headings: true
+```
+
+You can further customize this behavior by setting an explicit `offset` value on a page. By default the offset matches the nesting level in the table of contents, but, for example, if you want page numbering to be flat, despite nesting in the table of contents, you can set `offset: 0`:
+
+```yaml
+numbering:
+  title:
+    enabled: true
+    offset: 0
+```
+
+For the example above, the numbering will change to: `1 - index.md`, `2 - section_a.md`, `3 - chapter_1.md`, `4 - chapter_2.md`, and `5 - section_b.md`.

@@ -25,6 +25,7 @@ import { getSiteTemplate } from './template.js';
 import { collectExportOptions } from '../utils/collectExportOptions.js';
 import { filterPages } from '../../project/load.js';
 import { getRawFrontmatterFromFile } from '../../process/file.js';
+import { castSession } from '../../session/cache.js';
 
 type ManifestProject = Required<SiteManifest>['projects'][0];
 
@@ -133,9 +134,10 @@ export async function localToManifestProject(
   const proj = selectors.selectLocalProject(state, projectPath);
   if (!proj) return null;
   // Update all of the page title to the frontmatter title
-  const { index } = proj;
+  const { index, file: indexFile } = proj;
   const projectFileInfo = selectors.selectFileInfo(state, proj.file);
   const projectTitle = projConfig?.title || projectFileInfo.title || proj.index;
+  const cache = castSession(session);
   const pages = await Promise.all(
     proj.pages.map(async (page) => {
       if ('file' in page) {
@@ -149,7 +151,8 @@ export async function localToManifestProject(
         const bannerOptimized = fileInfo.bannerOptimized ?? '';
         const date = fileInfo.date ?? '';
         const tags = fileInfo.tags ?? [];
-        const { slug, level } = page;
+        const { slug, level, file } = page;
+        const { frontmatter } = cache.$getMdast(file)?.post ?? {};
         const projectPage: ManifestProject['pages'][0] = {
           slug,
           title,
@@ -162,6 +165,7 @@ export async function localToManifestProject(
           bannerOptimized,
           tags,
           level,
+          enumerator: frontmatter?.enumerator,
         };
         return projectPage;
       }
@@ -191,6 +195,7 @@ export async function localToManifestProject(
     session.publicPath(),
     { altOutputFolder: '/', webp: true },
   );
+  const { frontmatter } = cache.$getMdast(indexFile)?.post ?? {};
   return {
     ...projFrontmatter,
     // TODO: a null in the project frontmatter should not fall back to index page
@@ -212,6 +217,7 @@ export async function localToManifestProject(
     title: projectTitle || 'Untitled',
     slug: projectSlug,
     index,
+    enumerator: frontmatter?.enumerator,
     pages,
   };
 }

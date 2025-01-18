@@ -36,7 +36,6 @@ export type ISession = {
 export type ISessionWithCache = ISession & {
   $citationRenderers: Record<string, CitationRenderer>; // keyed on path
   $doiRenderers: Record<string, SingleCitationRenderer>; // keyed on doi
-  $internalReferences: Record<string, ReferenceState>; // keyed on path
   $externalReferences: Record<string, ResolvedExternalReference>; // keyed on id
   $mdast: Record<string, { sha256?: string; pre: PreRendererData; post?: RendererData }>; // keyed on path
   $siteTemplate: MystTemplate;

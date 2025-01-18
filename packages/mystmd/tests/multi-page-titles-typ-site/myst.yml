@@ -1,0 +1,23 @@
+# See docs at: https://mystmd.org/guide/frontmatter
+version: 1
+project:
+  id: 3a045569-08b0-4ce0-a917-4c18b22a45f3
+  author: Franklin Koch
+  date: 9 Jan 2025
+  title: My ABC Project
+  abstract: My ABC project is used for testing title and continuous enumeration.
+  toc:
+    - file: index.md
+    - file: a.md
+      children:
+        - file: b.md
+        - file: c.md
+    - file: d.md
+  exports:
+    - format: typst
+      output: _build/out.typ
+      template: null
+  numbering:
+    title: true
+site:
+  template: ../templates/site/myst/book-theme

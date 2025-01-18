@@ -1,0 +1,112 @@
+{
+  "options": {},
+  "myst": "1.3.20",
+  "nav": [],
+  "actions": [],
+  "projects": [
+    {
+      "date": "2025-01-09",
+      "exports": [],
+      "title": "My ABC Project",
+      "authors": [{ "id": "Franklin Koch", "name": "Franklin Koch" }],
+      "parts": {
+        "abstract": {
+          "mdast": {
+            "type": "root",
+            "children": [
+              {
+                "type": "block",
+                "data": { "part": "abstract" },
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "position": {
+                      "start": { "line": 1, "column": 1 },
+                      "end": { "line": 1, "column": 1 }
+                    },
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "My ABC project is used for testing title and continuous enumeration.",
+                        "position": {
+                          "start": { "line": 1, "column": 1 },
+                          "end": { "line": 1, "column": 1 }
+                        },
+                        "key": "oiMVgEMLmx"
+                      }
+                    ],
+                    "key": "AwFxeuJkBw"
+                  }
+                ],
+                "key": "qVRa1mGxr0"
+              }
+            ],
+            "key": "tB9oKy9nqh"
+          },
+          "frontmatter": {
+            "authors": [{ "id": "Franklin Koch", "name": "Franklin Koch" }],
+            "date": "2025-01-09"
+          }
+        }
+      },
+      "id": "3a045569-08b0-4ce0-a917-4c18b22a45f3",
+      "toc": [
+        { "file": "index.md" },
+        { "children": [{ "file": "b.md" }, { "file": "c.md" }], "file": "a.md" },
+        { "file": "d.md" }
+      ],
+      "bibliography": [],
+      "index": "index",
+      "pages": [
+        {
+          "slug": "a",
+          "title": "This is page A",
+          "description": "",
+          "date": "2025-01-09",
+          "thumbnail": "/image-1a1da07c9cf015c318caf5eb24016b4f.png",
+          "thumbnailOptimized": "/image-1a1da07c9cf015c318caf5eb24016b4f.webp",
+          "banner": "",
+          "bannerOptimized": "",
+          "tags": [],
+          "level": 1
+        },
+        {
+          "slug": "b",
+          "title": "This is page B - title in markdown",
+          "description": "",
+          "date": "2025-01-09",
+          "thumbnail": "/image-1a1da07c9cf015c318caf5eb24016b4f.png",
+          "thumbnailOptimized": "/image-1a1da07c9cf015c318caf5eb24016b4f.webp",
+          "banner": "",
+          "bannerOptimized": "",
+          "tags": [],
+          "level": 2
+        },
+        {
+          "slug": "c",
+          "title": "This is page C",
+          "description": "",
+          "date": "2025-01-09",
+          "thumbnail": "/image-1a1da07c9cf015c318caf5eb24016b4f.png",
+          "thumbnailOptimized": "/image-1a1da07c9cf015c318caf5eb24016b4f.webp",
+          "banner": "",
+          "bannerOptimized": "",
+          "tags": [],
+          "level": 2
+        },
+        {
+          "slug": "d",
+          "title": "This is page D",
+          "description": "",
+          "date": "2025-01-09",
+          "thumbnail": "/image-1a1da07c9cf015c318caf5eb24016b4f.png",
+          "thumbnailOptimized": "/image-1a1da07c9cf015c318caf5eb24016b4f.webp",
+          "banner": "",
+          "bannerOptimized": "",
+          "tags": [],
+          "level": 1
+        }
+      ]
+    }
+  ]
+}

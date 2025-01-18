@@ -6,15 +6,16 @@ import { writeFileToFolder, tic, hashAndCopyStaticFile } from 'myst-cli-utils';
 import { RuleId, toText, plural, slugToUrl } from 'myst-common';
 import type { SiteConfig, SiteProject } from 'myst-config';
 import type { Node } from 'myst-spec';
-import type { SearchRecord, MystSearchIndex } from 'myst-spec-ext';
+import { SourceFileKind } from 'myst-spec-ext';
+import type { Heading, SearchRecord, MystSearchIndex } from 'myst-spec-ext';
+import type { TargetCounts, LinkTransformer, MystXRefs } from 'myst-transforms';
+import { select, selectAll } from 'unist-util-select';
 import {
+  enumerateTargetsTransform,
+  ReferenceState,
   buildIndexTransform,
   MultiPageReferenceResolver,
-  type LinkTransformer,
-  type MystXRefs,
-  type ReferenceState,
 } from 'myst-transforms';
-import { select } from 'unist-util-select';
 import { VFile } from 'vfile';
 import { reloadAllConfigsForCurrentSite } from '../config.js';
 import type { SiteManifestOptions } from '../build/site/manifest.js';
@@ -305,6 +306,14 @@ function warnOnDuplicateIdentifiers(session: ISession, states: ReferenceState[])
   });
 }
 
+function referenceFileFromPartFile(session: ISession, partFile: string) {
+  const state = session.store.getState();
+  const partDeps = selectors.selectDependentFiles(state, partFile);
+  if (partDeps.length > 0) return partDeps[0];
+  const file = selectors.selectFileFromPart(state, partFile);
+  return file ?? partFile;
+}
+
 /**
  * Finalize and return list of page ReferenceStates
  *
@@ -325,9 +334,45 @@ export function selectPageReferenceStates(
   opts?: { suppressWarnings?: boolean },
 ) {
   const cache = castSession(session);
+  const headingDepths = new Set(
+    pages
+      .map(({ file }) => {
+        const { frontmatter, mdast } = cache.$getMdast(file)?.post ?? {};
+        const headingNodes = selectAll('heading', mdast).filter(
+          (node) => (node as Heading).enumerated !== false,
+        );
+        return headingNodes.map(
+          (node) =>
+            (node as Heading).depth -
+            (frontmatter?.numbering?.title?.enabled ? 0 : 1) +
+            (frontmatter?.numbering?.title?.offset ?? 0),
+        );
+      })
+      .flat(),
+  );
+  let previousCounts: TargetCounts | undefined;
   const pageReferenceStates: ReferenceState[] = pages
-    .map((page) => {
-      const state = cache.$internalReferences[page.file];
+    .map(({ file }) => {
+      const { frontmatter, identifiers, mdast, kind } = cache.$getMdast(file)?.post ?? {};
+      const vfile = new VFile();
+      vfile.path = file;
+
+      const refFile =
+        kind === SourceFileKind.Part ? referenceFileFromPartFile(session, file) : file;
+
+      const state = new ReferenceState(refFile, {
+        frontmatter,
+        identifiers,
+        headingDepths,
+        previousCounts,
+        vfile,
+      });
+      if (frontmatter && !frontmatter.enumerator) {
+        frontmatter.enumerator = state.enumerator;
+      }
+      if (mdast) enumerateTargetsTransform(mdast, { state });
+      previousCounts = state.targetCounts;
+      logMessagesFromVFile(session, vfile);
       if (state) {
         const selectedFile = selectors.selectFileInfo(session.store.getState(), state.filePath);
         if (selectedFile?.url) state.url = selectedFile.url;
@@ -339,20 +384,16 @@ export function selectPageReferenceStates(
     })
     .filter((state): state is ReferenceState => !!state);
   if (!opts?.suppressWarnings) warnOnDuplicateIdentifiers(session, pageReferenceStates);
-  pages.forEach((page) => {
-    const state = cache.$internalReferences[page.file];
-    if (!state) return;
-    const { mdast } = cache.$getMdast(page.file)?.post ?? {};
+  pageReferenceStates.forEach((state) => {
+    const { mdast } = cache.$getMdast(state.filePath)?.post ?? {};
     if (!mdast) return;
-    const vfile = new VFile();
-    vfile.path = page.file;
     buildIndexTransform(
       mdast,
-      vfile,
+      state.vfile,
       state,
       new MultiPageReferenceResolver(pageReferenceStates, state.filePath),
     );
-    logMessagesFromVFile(session, vfile);
+    logMessagesFromVFile(session, state.vfile);
   });
   return pageReferenceStates;
 }
@@ -436,6 +477,7 @@ export async function fastProcessFile(
   const projectParts = selectors.selectProjectParts(state, projectPath);
   await Promise.all(
     [file, ...fileParts].map(async (f) => {
+      const level = pages.find((page) => page.file === file)?.level;
       return transformMdast(session, {
         file: f,
         imageExtensions: imageExtensions ?? WEB_IMAGE_EXTENSIONS,
@@ -446,6 +488,7 @@ export async function fastProcessFile(
         extraTransforms,
         index: project.index,
         execute,
+        offset: level ? level - 1 : undefined,
       });
     }),
   );
@@ -456,7 +499,7 @@ export async function fastProcessFile(
     }),
   ]);
   await Promise.all(
-    [file, ...fileParts].map(async (f) => {
+    [...pages.map((p) => p.file), ...fileParts].map(async (f) => {
       return postProcessMdast(session, {
         file: f,
         pageReferenceStates,
@@ -465,10 +508,10 @@ export async function fastProcessFile(
     }),
   );
   await Promise.all(
-    [file, ...fileParts].map(async (f) => {
+    [...pages.map((p) => p.file), ...fileParts].map(async (f) => {
       const { mdast, frontmatter } = castSession(session).$getMdast(f)?.post ?? {};
-      if (mdast) {
-        await finalizeMdast(session, mdast, frontmatter ?? {}, f, {
+      if (mdast && frontmatter) {
+        await finalizeMdast(session, mdast, frontmatter, f, {
           imageWriteFolder: imageWriteFolder ?? session.publicPath(),
           imageAltOutputFolder: imageAltOutputFolder ?? '/',
           imageExtensions: imageExtensions ?? WEB_IMAGE_EXTENSIONS,
@@ -479,9 +522,16 @@ export async function fastProcessFile(
       }
     }),
   );
-  if (pageSlug) {
-    await writeFile(session, { file, pageSlug, projectSlug, projectPath });
-  }
+  await Promise.all(
+    pages.map(async (page) => {
+      return writeFile(session, {
+        file: page.file,
+        projectSlug,
+        projectPath,
+        pageSlug: page.slug,
+      });
+    }),
+  );
   session.log.info(toc(`📖 Built ${file} in %s.`));
   await writeSiteManifest(session, { defaultTemplate });
 }
@@ -537,7 +587,10 @@ export async function processProject(
     .map((part) => {
       return { file: part };
     });
-  const pagesToTransform: { file: string; slug?: string }[] = [...pages, ...projectParts];
+  const pagesToTransform: { file: string; slug?: string; level?: number }[] = [
+    ...pages,
+    ...projectParts,
+  ];
   const usedImageExtensions = imageExtensions ?? WEB_IMAGE_EXTENSIONS;
   // Transform all pages
   await Promise.all(
@@ -552,6 +605,7 @@ export async function processProject(
         execute,
         extraTransforms,
         index: project.index,
+        offset: page.level ? page.level - 1 : undefined,
       }),
     ),
   );

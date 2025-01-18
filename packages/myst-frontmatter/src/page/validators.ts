@@ -6,6 +6,7 @@ import {
   validateString,
   validateBoolean,
   validateObject,
+  validateNumber,
 } from 'simple-validators';
 import { validateProjectAndPageFrontmatterKeys } from '../project/validators.js';
 import { PAGE_FRONTMATTER_KEYS, type PageFrontmatter } from './types.js';
@@ -50,6 +51,9 @@ export function validatePageFrontmatterKeys(value: Record<string, any>, opts: Va
   }
   if (defined(value.jupytext)) {
     output.jupytext = validateJupytext(value.jupytext, incrementOptions('jupytext', opts));
+  }
+  if (defined(value.enumerator)) {
+    output.enumerator = validateString(value.enumerator, incrementOptions('enumerator', opts));
   }
   if (defined(value.content_includes_title)) {
     output.content_includes_title = validateBoolean(

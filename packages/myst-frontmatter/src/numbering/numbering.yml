@@ -186,3 +186,85 @@ cases:
         all:
           enabled: false
     warnings: 2
+  - title: continue validates
+    raw:
+      numbering:
+        figures:
+          continue: true
+    normalized:
+      numbering:
+        figure:
+          enabled: true
+          continue: true
+  - title: continue and start are allowed
+    raw:
+      numbering:
+        figures:
+          start: 5
+          continue: true
+    normalized:
+      numbering:
+        figure:
+          start: 5
+          enabled: true
+          continue: true
+  - title: continue strings coerce
+    raw:
+      numbering:
+        figures: next
+        tables:
+          start: continue
+    normalized:
+      numbering:
+        figure:
+          enabled: true
+          continue: true
+        table:
+          enabled: true
+          continue: true
+  - title: title validates
+    raw:
+      numbering:
+        title:
+          enabled: true
+          offset: 1
+    normalized:
+      numbering:
+        title:
+          enabled: true
+          offset: 1
+  - title: title boolean coerces
+    raw:
+      numbering:
+        title: true
+    normalized:
+      numbering:
+        title:
+          enabled: true
+  - title: title number coerces
+    raw:
+      numbering:
+        title: 0
+    normalized:
+      numbering:
+        title:
+          offset: 0
+          enabled: true
+  - title: extra fields ignored
+    raw:
+      numbering:
+        title:
+          enabled: true
+          start: 5
+        all:
+          enabled: true
+          template: 1.%s
+        enumerator:
+          continue: true
+    normalized:
+      numbering:
+        title:
+          enabled: true
+        all:
+          enabled: true
+    warnings: 3

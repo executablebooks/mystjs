@@ -1,0 +1,20 @@
+{
+  "kind": "Article",
+  "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "slug": "index",
+  "location": "/index.md",
+  "dependencies": [],
+  "frontmatter": {
+    "authors": [{ "id": "Franklin Koch", "name": "Franklin Koch" }],
+    "date": "2025-01-09",
+    "exports": [
+      {
+        "format": "md",
+        "filename": "index.md",
+        "url": "/index-12c3b71b1c21863cd5bca99bc1736926.md"
+      }
+    ]
+  },
+  "mdast": { "type": "root", "children": [], "key": "n24WzWVjXs" },
+  "references": { "cite": { "order": [], "data": {} } }
+}

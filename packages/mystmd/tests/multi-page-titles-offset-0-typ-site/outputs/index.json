@@ -1,0 +1,30 @@
+{
+  "kind": "Article",
+  "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "slug": "index",
+  "location": "/index.md",
+  "dependencies": [],
+  "frontmatter": {
+    "authors": [{ "id": "Franklin Koch", "name": "Franklin Koch" }],
+    "date": "2025-01-09",
+    "numbering": {
+      "title": { "enabled": true, "offset": 0 },
+      "heading_1": { "enabled": true },
+      "heading_2": { "enabled": true },
+      "heading_3": { "enabled": true },
+      "heading_4": { "enabled": true },
+      "heading_5": { "enabled": true },
+      "heading_6": { "enabled": true }
+    },
+    "enumerator": "1",
+    "exports": [
+      {
+        "format": "md",
+        "filename": "index.md",
+        "url": "/index-eefb8e6237ecfb217dab85a17b7e7a04.md"
+      }
+    ]
+  },
+  "mdast": { "type": "root", "children": [], "key": "PRyIJ71uEE" },
+  "references": { "cite": { "order": [], "data": {} } }
+}

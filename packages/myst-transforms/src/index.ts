@@ -61,7 +61,7 @@ export { containerChildrenPlugin, containerChildrenTransform } from './container
 export { headingDepthPlugin, headingDepthTransform } from './headings.js';
 
 // Enumeration
-export type { IReferenceStateResolver, ReferenceKind } from './enumerate.js';
+export type { IReferenceStateResolver, ReferenceKind, TargetCounts } from './enumerate.js';
 export {
   addChildrenFromTargetNode,
   enumerateTargetsTransform,

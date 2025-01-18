@@ -51,11 +51,13 @@ type ManifestProjectItem = {
   banner?: string | null;
   bannerOptimized?: string;
   tags?: string[];
+  enumerator?: string;
 };
 
 type ManifestProject = {
   slug?: string;
   index: string;
+  enumerator?: string;
   title: string;
   pages: ManifestProjectItem[];
   thumbnail?: string | null;

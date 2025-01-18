@@ -8,17 +8,17 @@ cases:
       type: root
       children:
         - type: heading
-          depth: 1
+          depth: 2
           children:
             - type: text
               value: one
         - type: heading
-          depth: 1
+          depth: 2
           children:
             - type: text
               value: two
         - type: heading
-          depth: 1
+          depth: 2
           children:
             - type: text
               value: three
@@ -26,19 +26,19 @@ cases:
       type: root
       children:
         - type: heading
-          depth: 1
+          depth: 2
           children:
             - type: text
               value: one
           enumerator: '1'
         - type: heading
-          depth: 1
+          depth: 2
           children:
             - type: text
               value: two
           enumerator: '2'
         - type: heading
-          depth: 1
+          depth: 2
           children:
             - type: text
               value: three
@@ -52,18 +52,18 @@ cases:
       type: root
       children:
         - type: heading
-          depth: 1
+          depth: 2
           children:
             - type: text
               value: one
         - type: heading
-          depth: 1
+          depth: 2
           enumerated: false
           children:
             - type: text
               value: nope
         - type: heading
-          depth: 1
+          depth: 2
           children:
             - type: text
               value: two
@@ -71,19 +71,19 @@ cases:
       type: root
       children:
         - type: heading
-          depth: 1
+          depth: 2
           children:
             - type: text
               value: one
           enumerator: '1'
         - type: heading
-          depth: 1
+          depth: 2
           enumerated: false
           children:
             - type: text
               value: nope
         - type: heading
-          depth: 1
+          depth: 2
           children:
             - type: text
               value: two
@@ -103,16 +103,20 @@ cases:
           enabled: true
         heading_6:
           enabled: true
+    headingDepths:
+      - 1
+      - 2
+      - 4
     before:
       type: root
       children:
         - type: heading
-          depth: 1
+          depth: 2
           children:
             - type: text
               value: one
         - type: heading
-          depth: 2
+          depth: 3
           children:
             - type: text
               value: one.one
@@ -127,7 +131,7 @@ cases:
             - type: text
               value: one.one.two
         - type: heading
-          depth: 1
+          depth: 2
           children:
             - type: text
               value: two
@@ -146,13 +150,13 @@ cases:
       type: root
       children:
         - type: heading
-          depth: 1
+          depth: 2
           children:
             - type: text
               value: one
           enumerator: '1'
         - type: heading
-          depth: 2
+          depth: 3
           children:
             - type: text
               value: one.one
@@ -170,7 +174,7 @@ cases:
               value: one.one.two
           enumerator: '1.1.2'
         - type: heading
-          depth: 1
+          depth: 2
           children:
             - type: text
               value: two
@@ -678,17 +682,17 @@ cases:
       type: root
       children:
         - type: heading
-          depth: 1
+          depth: 2
           children:
             - type: text
               value: one
         - type: heading
-          depth: 1
+          depth: 2
           children:
             - type: text
               value: two
         - type: heading
-          depth: 1
+          depth: 2
           children:
             - type: text
               value: three
@@ -696,19 +700,19 @@ cases:
       type: root
       children:
         - type: heading
-          depth: 1
+          depth: 2
           children:
             - type: text
               value: one
           enumerator: '5'
         - type: heading
-          depth: 1
+          depth: 2
           children:
             - type: text
               value: two
           enumerator: '6'
         - type: heading
-          depth: 1
+          depth: 2
           children:
             - type: text
               value: three
@@ -724,12 +728,12 @@ cases:
       type: root
       children:
         - type: heading
-          depth: 1
+          depth: 2
           children:
             - type: text
               value: one
         - type: heading
-          depth: 1
+          depth: 2
           children:
             - type: text
               value: two
@@ -737,13 +741,13 @@ cases:
       type: root
       children:
         - type: heading
-          depth: 1
+          depth: 2
           children:
             - type: text
               value: one
           enumerator: 'A1'
         - type: heading
-          depth: 1
+          depth: 2
           children:
             - type: text
               value: two

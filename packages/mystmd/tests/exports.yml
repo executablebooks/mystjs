@@ -298,3 +298,189 @@ cases:
         content: url-folders/outputs/myst.xref.json
       - path: url-folders/_build/site/content/my-proj/readme.json
         content: url-folders/outputs/readme.json
+  - title: Multi page project with no numbering specified
+    cwd: multi-page-typ-site
+    command: myst build --all
+    outputs:
+      - path: multi-page-typ-site/_build/site/config.json
+        content: multi-page-typ-site/outputs/config.json
+      - path: multi-page-typ-site/_build/site/content/index.json
+        content: multi-page-typ-site/outputs/index.json
+      - path: multi-page-typ-site/_build/site/content/a.json
+        content: multi-page-typ-site/outputs/a.json
+      - path: multi-page-typ-site/_build/site/content/b.json
+        content: multi-page-typ-site/outputs/b.json
+      - path: multi-page-typ-site/_build/site/content/c.json
+        content: multi-page-typ-site/outputs/c.json
+      - path: multi-page-typ-site/_build/site/content/d.json
+        content: multi-page-typ-site/outputs/d.json
+      - path: multi-page-typ-site/_build/out.typ
+        content: multi-page-typ-site/outputs/out.typ
+      - path: multi-page-typ-site/_build/out-a.typ
+        content: multi-page-typ-site/outputs/out-a.typ
+      - path: multi-page-typ-site/_build/out-b.typ
+        content: multi-page-typ-site/outputs/out-b.typ
+      - path: multi-page-typ-site/_build/out-c.typ
+        content: multi-page-typ-site/outputs/out-c.typ
+      - path: multi-page-typ-site/_build/out-d.typ
+        content: multi-page-typ-site/outputs/out-d.typ
+  - title: Multi page project with default heading numbering
+    cwd: multi-page-headings-typ-site
+    command: myst build --all
+    outputs:
+      - path: multi-page-headings-typ-site/_build/site/config.json
+        content: multi-page-headings-typ-site/outputs/config.json
+      - path: multi-page-headings-typ-site/_build/site/content/index.json
+        content: multi-page-headings-typ-site/outputs/index.json
+      - path: multi-page-headings-typ-site/_build/site/content/a.json
+        content: multi-page-headings-typ-site/outputs/a.json
+      - path: multi-page-headings-typ-site/_build/site/content/b.json
+        content: multi-page-headings-typ-site/outputs/b.json
+      - path: multi-page-headings-typ-site/_build/site/content/c.json
+        content: multi-page-headings-typ-site/outputs/c.json
+      - path: multi-page-headings-typ-site/_build/site/content/d.json
+        content: multi-page-headings-typ-site/outputs/d.json
+      - path: multi-page-headings-typ-site/_build/out.typ
+        content: multi-page-headings-typ-site/outputs/out.typ
+      - path: multi-page-headings-typ-site/_build/out-a.typ
+        content: multi-page-headings-typ-site/outputs/out-a.typ
+      - path: multi-page-headings-typ-site/_build/out-b.typ
+        content: multi-page-headings-typ-site/outputs/out-b.typ
+      - path: multi-page-headings-typ-site/_build/out-c.typ
+        content: multi-page-headings-typ-site/outputs/out-c.typ
+      - path: multi-page-headings-typ-site/_build/out-d.typ
+        content: multi-page-headings-typ-site/outputs/out-d.typ
+  - title: Single page project with no numbering specified
+    cwd: single-page-typ-site
+    command: myst build --all
+    outputs:
+      - path: single-page-typ-site/_build/site/config.json
+        content: single-page-typ-site/outputs/config.json
+      - path: single-page-typ-site/_build/site/content/index.json
+        content: single-page-typ-site/outputs/index.json
+      - path: single-page-typ-site/_build/out.typ
+        content: single-page-typ-site/outputs/out.typ
+  - title: Single page project with default heading numbering
+    cwd: single-page-headings-typ-site
+    command: myst build --all
+    outputs:
+      - path: single-page-headings-typ-site/_build/site/config.json
+        content: single-page-headings-typ-site/outputs/config.json
+      - path: single-page-headings-typ-site/_build/site/content/index.json
+        content: single-page-headings-typ-site/outputs/index.json
+      - path: single-page-headings-typ-site/_build/out.typ
+        content: single-page-headings-typ-site/outputs/out.typ
+  - title: Multi page project with default title numbering
+    cwd: multi-page-titles-typ-site
+    command: myst build --all
+    outputs:
+      - path: multi-page-titles-typ-site/_build/site/config.json
+        content: multi-page-titles-typ-site/outputs/config.json
+      - path: multi-page-titles-typ-site/_build/site/content/index.json
+        content: multi-page-titles-typ-site/outputs/index.json
+      - path: multi-page-titles-typ-site/_build/site/content/a.json
+        content: multi-page-titles-typ-site/outputs/a.json
+      - path: multi-page-titles-typ-site/_build/site/content/b.json
+        content: multi-page-titles-typ-site/outputs/b.json
+      - path: multi-page-titles-typ-site/_build/site/content/c.json
+        content: multi-page-titles-typ-site/outputs/c.json
+      - path: multi-page-titles-typ-site/_build/site/content/d.json
+        content: multi-page-titles-typ-site/outputs/d.json
+      - path: multi-page-titles-typ-site/_build/out.typ
+        content: multi-page-titles-typ-site/outputs/out.typ
+      - path: multi-page-titles-typ-site/_build/out-a.typ
+        content: multi-page-titles-typ-site/outputs/out-a.typ
+      - path: multi-page-titles-typ-site/_build/out-b.typ
+        content: multi-page-titles-typ-site/outputs/out-b.typ
+      - path: multi-page-titles-typ-site/_build/out-c.typ
+        content: multi-page-titles-typ-site/outputs/out-c.typ
+      - path: multi-page-titles-typ-site/_build/out-d.typ
+        content: multi-page-titles-typ-site/outputs/out-d.typ
+  - title: Multi page project with default title and heading numbering
+    cwd: multi-page-titles-and-headings-typ-site
+    command: myst build --all
+    outputs:
+      - path: multi-page-titles-and-headings-typ-site/_build/site/config.json
+        content: multi-page-titles-and-headings-typ-site/outputs/config.json
+      - path: multi-page-titles-and-headings-typ-site/_build/site/content/index.json
+        content: multi-page-titles-and-headings-typ-site/outputs/index.json
+      - path: multi-page-titles-and-headings-typ-site/_build/site/content/a.json
+        content: multi-page-titles-and-headings-typ-site/outputs/a.json
+      - path: multi-page-titles-and-headings-typ-site/_build/site/content/b.json
+        content: multi-page-titles-and-headings-typ-site/outputs/b.json
+      - path: multi-page-titles-and-headings-typ-site/_build/site/content/c.json
+        content: multi-page-titles-and-headings-typ-site/outputs/c.json
+      - path: multi-page-titles-and-headings-typ-site/_build/site/content/d.json
+        content: multi-page-titles-and-headings-typ-site/outputs/d.json
+      - path: multi-page-titles-and-headings-typ-site/_build/out.typ
+        content: multi-page-titles-and-headings-typ-site/outputs/out.typ
+      - path: multi-page-titles-and-headings-typ-site/_build/out-a.typ
+        content: multi-page-titles-and-headings-typ-site/outputs/out-a.typ
+      - path: multi-page-titles-and-headings-typ-site/_build/out-b.typ
+        content: multi-page-titles-and-headings-typ-site/outputs/out-b.typ
+      - path: multi-page-titles-and-headings-typ-site/_build/out-c.typ
+        content: multi-page-titles-and-headings-typ-site/outputs/out-c.typ
+      - path: multi-page-titles-and-headings-typ-site/_build/out-d.typ
+        content: multi-page-titles-and-headings-typ-site/outputs/out-d.typ
+  - title: Multi page project with offset 0 title and heading numbering
+    cwd: multi-page-titles-offset-0-typ-site
+    command: myst build --all
+    outputs:
+      - path: multi-page-titles-offset-0-typ-site/_build/site/config.json
+        content: multi-page-titles-offset-0-typ-site/outputs/config.json
+      - path: multi-page-titles-offset-0-typ-site/_build/site/content/index.json
+        content: multi-page-titles-offset-0-typ-site/outputs/index.json
+      - path: multi-page-titles-offset-0-typ-site/_build/site/content/a.json
+        content: multi-page-titles-offset-0-typ-site/outputs/a.json
+      - path: multi-page-titles-offset-0-typ-site/_build/site/content/b.json
+        content: multi-page-titles-offset-0-typ-site/outputs/b.json
+      - path: multi-page-titles-offset-0-typ-site/_build/site/content/c.json
+        content: multi-page-titles-offset-0-typ-site/outputs/c.json
+      - path: multi-page-titles-offset-0-typ-site/_build/site/content/d.json
+        content: multi-page-titles-offset-0-typ-site/outputs/d.json
+      - path: multi-page-titles-offset-0-typ-site/_build/out.typ
+        content: multi-page-titles-offset-0-typ-site/outputs/out.typ
+      - path: multi-page-titles-offset-0-typ-site/_build/out-a.typ
+        content: multi-page-titles-offset-0-typ-site/outputs/out-a.typ
+      - path: multi-page-titles-offset-0-typ-site/_build/out-b.typ
+        content: multi-page-titles-offset-0-typ-site/outputs/out-b.typ
+      - path: multi-page-titles-offset-0-typ-site/_build/out-c.typ
+        content: multi-page-titles-offset-0-typ-site/outputs/out-c.typ
+      - path: multi-page-titles-offset-0-typ-site/_build/out-d.typ
+        content: multi-page-titles-offset-0-typ-site/outputs/out-d.typ
+  - title: Multi page project with continuous figure numbering
+    cwd: multi-page-figures-typ-site
+    command: myst build --all
+    outputs:
+      - path: multi-page-figures-typ-site/_build/site/config.json
+        content: multi-page-figures-typ-site/outputs/config.json
+      - path: multi-page-figures-typ-site/_build/site/content/index.json
+        content: multi-page-figures-typ-site/outputs/index.json
+      - path: multi-page-figures-typ-site/_build/site/content/a.json
+        content: multi-page-figures-typ-site/outputs/a.json
+      - path: multi-page-figures-typ-site/_build/site/content/b.json
+        content: multi-page-figures-typ-site/outputs/b.json
+      - path: multi-page-figures-typ-site/_build/site/content/c.json
+        content: multi-page-figures-typ-site/outputs/c.json
+      - path: multi-page-figures-typ-site/_build/site/content/d.json
+        content: multi-page-figures-typ-site/outputs/d.json
+      - path: multi-page-figures-typ-site/_build/out.typ
+        content: multi-page-figures-typ-site/outputs/out.typ
+      - path: multi-page-figures-typ-site/_build/out-a.typ
+        content: multi-page-figures-typ-site/outputs/out-a.typ
+      - path: multi-page-figures-typ-site/_build/out-b.typ
+        content: multi-page-figures-typ-site/outputs/out-b.typ
+      - path: multi-page-figures-typ-site/_build/out-c.typ
+        content: multi-page-figures-typ-site/outputs/out-c.typ
+      - path: multi-page-figures-typ-site/_build/out-d.typ
+        content: multi-page-figures-typ-site/outputs/out-d.typ
+  - title: Single page project with default title and heading numbering
+    cwd: single-page-titles-typ-site
+    command: myst build --all
+    outputs:
+      - path: single-page-titles-typ-site/_build/site/config.json
+        content: single-page-titles-typ-site/outputs/config.json
+      - path: single-page-titles-typ-site/_build/site/content/index.json
+        content: single-page-titles-typ-site/outputs/index.json
+      - path: single-page-titles-typ-site/_build/out.typ
+        content: single-page-titles-typ-site/outputs/out.typ
